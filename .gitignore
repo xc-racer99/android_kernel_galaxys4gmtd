@@ -77,3 +77,6 @@ GTAGS
 *.orig
 *~
 \#*#
+
+# Ignore the files inside the build directory
+/build/*
