@@ -68,8 +68,16 @@ build()
     prep
     printf "============== Build ===================\n"
     cd ${SRC}
-    make ${DEFAULT_ARGS} || error "Build Failed!"
-    make ${DEFAULT_ARGS} modules || error "Build Modules Failed!"
+    if [ -f ${SRC}/../build.log ]
+    then
+	rm ${SRC}/../build.log
+    fi
+    if [ -f ${SRC}/../modules.log ]
+    then
+	rm ${SRC}/../modules.log
+    fi
+    make ${DEFAULT_ARGS} | tee ${SRC}/../build.log || error "Build Failed!"
+    make ${DEFAULT_ARGS} modules | tee ${SRC}/../modules.log || error "Build Modules Failed!"
     if [ -f arch/${ARCH}/boot/zImage ]
     then
         printf "Copying zImage to: device/samsung/${DEVICE}/kernel\n"
