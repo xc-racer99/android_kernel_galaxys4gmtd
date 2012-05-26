@@ -1303,6 +1303,9 @@ int fimc_reqbufs_output(void *fh, struct v4l2_requestbuffers *b)
 			ret = fimc_outdev_set_dst_buf(ctrl, ctx);
 			if (ret)
 				return ret;
+		} else if (b->memory == V4L2_MEMORY_USERPTR) {
+			if (mode == FIMC_OVLY_DMA_AUTO)
+				ctx->overlay.req_idx = FIMC_USERPTR_IDX;
 		}
 
 		ctx->is_requested = 1;
