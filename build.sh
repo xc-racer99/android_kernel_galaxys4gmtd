@@ -72,12 +72,8 @@ build()
     then
 	rm ${SRC}/../build.log
     fi
-    if [ -f ${SRC}/../modules.log ]
-    then
-	rm ${SRC}/../modules.log
-    fi
     make ${DEFAULT_ARGS} 2>&1 | tee ${SRC}/../build.log || error "Build Failed!"
-    make ${DEFAULT_ARGS} modules 2>&1 | tee ${SRC}/../modules.log || error "Build Modules Failed!"
+    make ${DEFAULT_ARGS} modules 2>&1 | tee -a ${SRC}/../build.log || error "Build Modules Failed!"
     if [ -f arch/${ARCH}/boot/zImage ]
     then
         printf "Copying zImage to: device/samsung/${DEVICE}/kernel\n"
