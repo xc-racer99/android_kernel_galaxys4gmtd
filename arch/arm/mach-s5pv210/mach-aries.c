@@ -220,11 +220,8 @@ static int aries_notifier_call(struct notifier_block *this,
 		else
 			mode = REBOOT_MODE_NONE;
 	}
-	if (code != SYS_POWER_OFF) {
-		if (sec_set_param_value) {
-			sec_set_param_value(__REBOOT_MODE, &mode);
-		}
-	}
+	
+	__raw_writel(mode, S5P_INFORM6);
 
 	return NOTIFY_DONE;
 }
@@ -6998,20 +6995,10 @@ static void aries_power_off(void)
 		if (charger_callbacks &&
 		    charger_callbacks->get_vdcin &&
 		    charger_callbacks->get_vdcin(charger_callbacks)) {
-			int reboot_mode = REBOOT_MODE_NONE;
 
 			/* watchdog reset */
 			pr_info("%s: charger connected, rebooting\n", __func__);
-			if (sec_get_param_value)
-				sec_get_param_value(__REBOOT_MODE, &reboot_mode);
-
-			if (reboot_mode == REBOOT_MODE_ARM11_FOTA)
-				mode = REBOOT_MODE_ARM11_FOTA;
-			else
-			mode = REBOOT_MODE_CHARGING;
-
-			if (sec_set_param_value)
-				sec_set_param_value(__REBOOT_MODE, &mode);
+			writel(3, S5P_INFORM6); // Charging
 			arch_reset('r', NULL);
 			pr_crit("%s: waiting for reset!\n", __func__);
 			while (1);
