@@ -2672,7 +2672,7 @@ static struct wm8994_platform_data wm8994_pdata = {
  * Guide for Camera Configuration for Jupiter board
  * ITU CAM CH A: CE147
 */
-
+static DEFINE_MUTEX(ce147_lock);
 static struct regulator *cam_isp_core_regulator;/*buck4*/
 static struct regulator *cam_isp_host_regulator;/*15*/
 static struct regulator *cam_af_regulator;/*11*/
@@ -3077,7 +3077,6 @@ static int ce147_power_off(void)
 
 static int ce147_power_en(int onoff)
 {
-	int bd_level;
 	int err = 0;
 #if 0
 	if(onoff){
@@ -3094,7 +3093,7 @@ static int ce147_power_en(int onoff)
 
 	return 0;
 #endif
-
+	mutex_lock(&ce147_lock);
 	if (onoff != ce147_powered_on) {
 		if (onoff)
 			err = ce147_power_on();
@@ -3105,8 +3104,8 @@ static int ce147_power_en(int onoff)
 		if (!err)
 			ce147_powered_on = onoff;
 	}
-
-	return 0;
+	mutex_unlock(&ce147_lock);
+	return err;
 }
 
 static int smdkc110_cam1_power(int onoff)
