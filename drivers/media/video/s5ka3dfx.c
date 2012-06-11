@@ -89,6 +89,7 @@ struct s5ka3dfx_state {
 
 enum {
 	S5KA3DFX_PREVIEW_QCIF,
+	S5KA3DFX_PREVIEW_QVGA,
 	S5KA3DFX_PREVIEW_VGA,
 };
 
@@ -100,6 +101,7 @@ struct s5ka3dfx_enum_framesize {
 
 struct s5ka3dfx_enum_framesize s5ka3dfx_framesize_list[] = {
 	{ S5KA3DFX_PREVIEW_QCIF, 176, 144 },
+	{ S5KA3DFX_PREVIEW_QVGA, 320, 240 },
 	{ S5KA3DFX_PREVIEW_VGA, 640, 480 }
 };
 
@@ -171,7 +173,6 @@ static struct s5ka3dfx_regset_table fps_vt_table[] = {
 	S5KA3DFX_REGSET_TABLE_ELEMENT(0, s5ka3dfx_vt_fps_7),
 	S5KA3DFX_REGSET_TABLE_ELEMENT(1, s5ka3dfx_vt_fps_10),
 	S5KA3DFX_REGSET_TABLE_ELEMENT(2, s5ka3dfx_vt_fps_15),
-	S5KA3DFX_REGSET_TABLE_ELEMENT(3, s5ka3dfx_vt_fps_auto),
 };
 
 static struct s5ka3dfx_regset_table fps_table[] = {
@@ -211,14 +212,11 @@ static struct s5ka3dfx_regset_table init_vt_reg[] = {
 	S5KA3DFX_REGSET_TABLE_ELEMENT(0, s5ka3dfx_init_vt_reg),
 };
 
-//NAGSM_ANDROID_HQ_CAMERA_SoojinKim_20110512 : vtmode 2
-static struct s5ka3dfx_regset_table init_vt2_reg[] = {
-	S5KA3DFX_REGSET_TABLE_ELEMENT(0, s5ka3dfx_init_vt2_reg),
-};
 
 static struct s5ka3dfx_regset_table frame_size[] = {
 	S5KA3DFX_REGSET_TABLE_ELEMENT(0, s5ka3dfx_QCIF),
-	S5KA3DFX_REGSET_TABLE_ELEMENT(1, s5ka3dfx_Return_VGA),
+	S5KA3DFX_REGSET_TABLE_ELEMENT(1, s5ka3dfx_QVGA),
+	S5KA3DFX_REGSET_TABLE_ELEMENT(2, s5ka3dfx_Return_VGA),
 };
 static int s5ka3dfx_reset(struct v4l2_subdev *sd)
 {
@@ -575,15 +573,11 @@ static int s5ka3dfx_g_parm(struct v4l2_subdev *sd,
 			   struct v4l2_streamparm *param)
 {
 	struct i2c_client *client = v4l2_get_subdevdata(sd);
-	struct s5ka3dfx_state *state =
-		container_of(sd, struct s5ka3dfx_state, sd);
+	int err = 0;
 
 	dev_dbg(&client->dev, "%s\n", __func__);
-	state->strm.parm.capture.timeperframe.numerator = 1;
-	state->strm.parm.capture.timeperframe.denominator = state->fps;
-	memcpy(param, &state->strm, sizeof(param));
-
-	return 0;
+	
+	return err;
 }
 
 static int s5ka3dfx_s_parm(struct v4l2_subdev *sd,
@@ -726,7 +720,7 @@ out:
 
 /* set sensor register values for frame rate(fps) setting */
 static int s5ka3dfx_set_frame_rate(struct v4l2_subdev *sd,
-				   int state_fps)
+				   struct v4l2_control *ctrl)
 {
 	struct i2c_client *client = v4l2_get_subdevdata(sd);
 	struct s5ka3dfx_state *state =
@@ -736,11 +730,11 @@ static int s5ka3dfx_set_frame_rate(struct v4l2_subdev *sd,
 	int err = -EINVAL;
 	int fps_index;
 
-	dev_dbg(&client->dev, "%s: value : %d\n", __func__, state_fps);
+	dev_dbg(&client->dev, "%s: value : %d\n", __func__, ctrl->value);
 
 	pr_debug("state->vt_mode : %d\n", state->vt_mode);
 
-	switch (state_fps) {
+	switch (ctrl->value) {
 	case 0:
 		fps_index = 3;
 		break; 
@@ -758,8 +752,8 @@ static int s5ka3dfx_set_frame_rate(struct v4l2_subdev *sd,
 		break;
 
 	default:
-		dev_err(&client->dev, "%s: Value(%d) is not supported\n",
-			__func__, state_fps);
+		dev_dbg(&client->dev, "%s: Value(%d) is not supported\n",
+			__func__, ctrl->value);
 		goto out;
 	}
 
@@ -772,7 +766,7 @@ static int s5ka3dfx_set_frame_rate(struct v4l2_subdev *sd,
 	state->fps = fps_index;
 
 	err = s5ka3dfx_write_regset_table(sd, fps);
-	state->fps = state_fps;
+
 out:
 	return err;
 }
@@ -905,8 +899,9 @@ static int s5ka3dfx_get_shutterspeed(struct v4l2_subdev *sd,
 		return read_value;
 	cintr |= read_value & 0xFF;
 
-	/* A3D Shutter Speed (Sec.) = MCLK / (2 * (cintr - 1) * 814) */
-	ctrl->value =  ((cintr - 1) * 1628) / (state->freq / 1000);
+	/* A3D Shutter Speed (Micro Sec.) =
+		(2 * (cintr - 1) * 814) / MCLK  * 1000 */
+	ctrl->value =  ((cintr - 1) * 1628) / (state->freq / 1000) * 1000;
 
 	dev_dbg(&client->dev,
 			"%s: get shutterspeed == %d\n", __func__, ctrl->value);
@@ -1008,9 +1003,7 @@ static int s5ka3dfx_s_ctrl(struct v4l2_subdev *sd, struct v4l2_control *ctrl)
 	case V4L2_CID_CAMERA_FRAME_RATE:
 		dev_dbg(&client->dev, "%s: "
 				"V4L2_CID_CAMERA_FRAME_RATE\n", __func__);
-		state->fps = ctrl->value;
-		err = 0;
-		//err =  s5ka3dfx_set_frame_rate(sd, ctrl->value);
+		err = s5ka3dfx_set_frame_rate(sd, ctrl);
 		break;
 
 	case V4L2_CID_CAMERA_VGA_BLUR:
@@ -1095,13 +1088,9 @@ static int s5ka3dfx_init(struct v4l2_subdev *sd, u32 val)
 			err = s5ka3dfx_write_regset_table(sd, dataline);
 		else
 			err = s5ka3dfx_write_regset_table(sd, init_reg);
-	}  //NAGSM_ANDROID_HQ_CAMERA_SoojinKim_20110512 : vtmode 2
-	else { 
-		if (state->vt_mode == 1)
-			err = s5ka3dfx_write_regset_table(sd, init_vt_reg);
-		else
-			err = s5ka3dfx_write_regset_table(sd, init_vt2_reg);
-	}
+	} else 
+		err = s5ka3dfx_write_regset_table(sd, init_vt_reg);
+	
 	if (err < 0) {
 		/* This is preview fail */
 		state->check_previewdata = 100;
@@ -1110,7 +1099,6 @@ static int s5ka3dfx_init(struct v4l2_subdev *sd, u32 val)
 			__func__, state->check_previewdata);
 		return -EIO;
 	}
-	s5ka3dfx_set_frame_rate(sd, state->fps);
 
 	/* This is preview success */
 	state->check_previewdata = 0;
