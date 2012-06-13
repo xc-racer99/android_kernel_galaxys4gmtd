@@ -20,6 +20,6 @@ source "drivers/media/video/samsung/jpeg_v2/Kconfig"
 source "drivers/media/video/samsung/tv20/Kconfig"
 #source "drivers/media/video/samsung/tsi/Kconfig"
 #source "drivers/media/video/samsung/rotator/Kconfig"
-source "drivers/media/video/samsung/g2d/Kconfig"
-source "drivers/media/video/samsung/mhl_v1/Kconfig"
+#source "drivers/media/video/samsung/g2d/Kconfig"
+#source "drivers/media/video/samsung/mhl_v1/Kconfig"
 endif

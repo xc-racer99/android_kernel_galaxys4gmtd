@@ -36,7 +36,7 @@
  * MFC_FW_TOTAL_BUF_SIZE should be aligned to 4KB (page size)
  */
 #define MFC_FW_TOTAL_BUF_SIZE (ALIGN_TO_4KB(MFC_FW_MAX_SIZE + MFC_MAX_INSTANCE_NUM * MFC_FW_BUF_SIZE))
-#define MFC_FW_MAX_SIZE       (512 * 1024) 	   /* 512KB : 512x1024                  */
+#define MFC_FW_MAX_SIZE       (2 * 1024 * 1024) /* 2MB : 2x1024x1024                  */
 #define MFC_FW_BUF_SIZE       (512 * 1024)     /* 512KB : 512x1024 size per instance */
 
 #define RISC_BUF_SIZE         (0x80000)        /* 512KB : 512x1024 size per instance */
@@ -101,7 +101,6 @@ unsigned int mfc_get_port0_buff_paddr(void);
 unsigned char *mfc_get_port0_buff_vaddr(void);
 unsigned int mfc_get_port1_buff_paddr(void);
 unsigned char *mfc_get_port1_buff_vaddr(void);
-void mfc_set_port1_buff_paddr(unsigned int addr);
 
 extern void __iomem *mfc_sfr_base_vaddr;
 
