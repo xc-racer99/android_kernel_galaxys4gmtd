@@ -181,7 +181,7 @@ EXPORT_SYMBOL(sec_get_param_value);
 #define WLAN_SECTION_SIZE_2	(PREALLOC_WLAN_BUF_NUM * 512)
 #define WLAN_SECTION_SIZE_3	(PREALLOC_WLAN_BUF_NUM * 1024)
 
-#define WLAN_SKB_BUF_NUM	17
+#define WLAN_SKB_BUF_NUM	16
 
 #if defined(CONFIG_S5PC110_HAWK_BOARD)
 unsigned int HWREV_HAWK=0;
@@ -7243,30 +7243,18 @@ static void *aries_mem_prealloc(int section, unsigned long size)
 	return wifi_mem_array[section].mem_ptr;
 }
 
-#define DHD_SKB_HDRSIZE 		336
-#define DHD_SKB_1PAGE_BUFSIZE	((PAGE_SIZE*1)-DHD_SKB_HDRSIZE)
-#define DHD_SKB_2PAGE_BUFSIZE	((PAGE_SIZE*2)-DHD_SKB_HDRSIZE)
-#define DHD_SKB_4PAGE_BUFSIZE	((PAGE_SIZE*4)-DHD_SKB_HDRSIZE)
 int __init aries_init_wifi_mem(void)
 {
 	int i;
 	int j;
 
-	for (i = 0; i < 8; i++) {
-		wlan_static_skb[i] = dev_alloc_skb(DHD_SKB_1PAGE_BUFSIZE);
+	for (i = 0 ; i < WLAN_SKB_BUF_NUM ; i++) {
+		wlan_static_skb[i] = dev_alloc_skb(
+				((i < (WLAN_SKB_BUF_NUM / 2)) ? 4096 : 8192));
+
 		if (!wlan_static_skb[i])
 			goto err_skb_alloc;
 	}
-	
-	for (; i < 16; i++) {
-		wlan_static_skb[i] = dev_alloc_skb(DHD_SKB_2PAGE_BUFSIZE);
-		if (!wlan_static_skb[i])
-			goto err_skb_alloc;
-	}
-	
-	wlan_static_skb[i] = dev_alloc_skb(DHD_SKB_4PAGE_BUFSIZE);
-	if (!wlan_static_skb[i])
-		goto err_skb_alloc;
 
 	for (i = 0 ; i < PREALLOC_WLAN_SEC_NUM ; i++) {
 		wifi_mem_array[i].mem_ptr =
@@ -7275,7 +7263,6 @@ int __init aries_init_wifi_mem(void)
 		if (!wifi_mem_array[i].mem_ptr)
 			goto err_mem_alloc;
 	}
-	printk("%s: WIFI MEM Allocated\n", __FUNCTION__);
 	return 0;
 
  err_mem_alloc:
