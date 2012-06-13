@@ -7307,7 +7307,6 @@ static struct platform_device *aries_devices[] __initdata = {
 	&s3c_device_fimc0,
 	&s3c_device_fimc1,
 	&s3c_device_fimc2,
-	&s3c_device_csis,
 #endif
 
 #ifdef CONFIG_VIDEO_JPEG_V2
@@ -7763,7 +7762,6 @@ static void __init aries_machine_init(void)
 	s3c_fimc0_set_platdata(&fimc_plat_lsi);
 	s3c_fimc1_set_platdata(&fimc_plat_lsi);
 	s3c_fimc2_set_platdata(&fimc_plat_lsi);
-	s3c_csis_set_platdata(NULL);
 #endif
 
 #ifdef CONFIG_VIDEO_JPEG_V2
