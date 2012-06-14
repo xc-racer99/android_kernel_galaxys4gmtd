@@ -122,6 +122,12 @@ distclean()
     finalize
 }
 
+buildclean()
+{
+    distclean
+    build
+}
+
 repack()
 {
     prep
@@ -195,6 +201,9 @@ main()
             ;;
         distclean)
             distclean
+            ;;
+        buildclean)
+            buildclean
             ;;
         repack)
             repack
