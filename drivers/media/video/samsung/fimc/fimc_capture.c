@@ -1062,7 +1062,6 @@ int fimc_reqbufs_capture(void *fh, struct v4l2_requestbuffers *b)
 	case V4L2_PIX_FMT_NV12:
 		size[0] = cap->fmt.width * cap->fmt.height;
 		size[1] = cap->fmt.width * cap->fmt.height/2;
-		size[3] = 16; /* Padding buffer */
 		break;
 	case V4L2_PIX_FMT_NV21:
 		size[0] = cap->fmt.width * cap->fmt.height;
@@ -1101,6 +1100,7 @@ int fimc_reqbufs_capture(void *fh, struct v4l2_requestbuffers *b)
 		size[0] = cap->fmt.width * cap->fmt.height;
 		size[1] = cap->fmt.width * cap->fmt.height >> 2;
 		size[2] = cap->fmt.width * cap->fmt.height >> 2;
+		size[3] = 16; /* Padding buffer */
 		break;
 
 	case V4L2_PIX_FMT_JPEG:
