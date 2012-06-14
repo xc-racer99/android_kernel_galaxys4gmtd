@@ -38,8 +38,6 @@
 
 #include "fimc.h"
 
-#define CLEAR_FIMC2_BUFF
-
 struct fimc_global *fimc_dev;
 
 int fimc_dma_alloc(struct fimc_control *ctrl, struct fimc_buf_set *bs,
@@ -402,7 +400,6 @@ static inline void fimc_irq_cap(struct fimc_control *ctrl)
 		cfg = readl(ctrl->regs + S3C_CIGCTRL);
 		cfg |= (S3C_CIGCTRL_SWRST);
 		writel(cfg, ctrl->regs + S3C_CIGCTRL);
-
 		msleep(1);
 
 		cfg = readl(ctrl->regs + S3C_CIGCTRL);
@@ -626,11 +623,7 @@ int fimc_mmap_out_dst(struct file *filp, struct vm_area_struct *vma, u32 idx)
 	vma->vm_page_prot = pgprot_noncached(vma->vm_page_prot);
 	vma->vm_flags |= VM_RESERVED;
 
-	if (ctrl->out->ctx[ctx_id].dst[idx].base[0])
-		pfn = __phys_to_pfn(ctrl->out->ctx[ctx_id].dst[idx].base[0]);
-	else
-		pfn = __phys_to_pfn(ctrl->mem.curr);
-
+	pfn = __phys_to_pfn(ctrl->out->ctx[ctx_id].dst[idx].base[0]);
 	ret = remap_pfn_range(vma, vma->vm_start, pfn, size, vma->vm_page_prot);
 	if (ret != 0)
 		fimc_err("remap_pfn_range fail.\n");
@@ -720,69 +713,15 @@ static u32 fimc_poll(struct file *filp, poll_table *wait)
 	return mask;
 }
 
-//NAGSM_HQ_CAMERA_LEESUNGKOO_20101115 : for flash touch mode
-#include <mach/gpio.h>
-#include <plat/gpio-cfg.h>
-#include <mach/gpio-aries.h>
-#include <linux/delay.h>
-
 static
 ssize_t fimc_read(struct file *filp, char *buf, size_t count, loff_t *pos)
 {
-	int err = 0;
-
-#if defined(CONFIG_S5PC110_HAWK_BOARD)
-	printk("%s, for factory test\n", __func__);
-
-	gpio_direction_output(S5PV210_GPJ2(0), 0);
-	gpio_direction_output(S5PV210_GPJ2(1), 0);
-
-	gpio_free(S5PV210_GPJ2(0));
-	gpio_free(S5PV210_GPJ2(1));
-#else
-	printk("%s is not define until now\n", __func__);
-#endif
-	return err;
+	return 0;
 }
 
 static
 ssize_t fimc_write(struct file *filp, const char *b, size_t c, loff_t *offset)
 {
-	int i = 0;
-	int err = 0;
-
-#if defined(CONFIG_S5PC110_HAWK_BOARD)
-	printk("%s, for factory test\n", __func__);
-
-	err = gpio_request(S5PV210_GPJ2(0), "GPJ20");
-	if (err) 
-	{
-		printk(KERN_ERR "failed to request GPJ20 for camera control\n");
-		return err;
-	}
-	err = gpio_request(S5PV210_GPJ2(1), "GPJ21");
-	if (err) 
-	{
-		printk(KERN_ERR "failed to request GPJ21 for camera control\n");
-		return err;
-	}
-	//movie mode
-	gpio_direction_output(S5PV210_GPJ2(0), 0);
-	for (i = 8; i > 1; i--)
-	{
-		//gpio on
-		gpio_direction_output(S5PV210_GPJ2(1), 1);
-		udelay(1);
-		//gpio off
-		gpio_direction_output(S5PV210_GPJ2(1), 0);
-		udelay(1);
-	}
-	gpio_direction_output(S5PV210_GPJ2(1), 1);
-	mdelay(2);
-#else
-	printk("%s is not define until now\n", __func__);
-#endif
-
 	return 0;
 }
 
@@ -954,9 +893,6 @@ static int fimc_open(struct file *filp)
 	struct fimc_prv_data *prv_data;
 	int in_use;
 	int ret;
-#ifdef CLEAR_FIMC2_BUFF
-	unsigned int *fimc2_buff;
-#endif
 
 	ctrl = video_get_drvdata(video_devdata(filp));
 	pdata = to_fimc_plat(ctrl->dev);
@@ -1014,17 +950,6 @@ static int fimc_open(struct file *filp)
 			fimc_clk_en(ctrl, false);
 	}
 
-#ifdef CLEAR_FIMC2_BUFF
-	if (2 == ctrl->id) {
-		fimc2_buff = (unsigned int *)ioremap(ctrl->mem.base,
-								ctrl->mem.size);
-		if (fimc2_buff) {
-			memset(fimc2_buff, 0, ctrl->mem.size);
-			iounmap(fimc2_buff);
-		}
-	}
-#endif
-
 	mutex_unlock(&ctrl->lock);
 
 	fimc_info1("%s opened.\n", ctrl->name);
@@ -1053,6 +978,7 @@ static int fimc_release(struct file *filp)
 	struct mm_struct *mm = current->mm;
 	struct fimc_ctx *ctx;
 	int ret = 0, i;
+	ctx = &ctrl->out->ctx[ctx_id];
 
 	pdata = to_fimc_plat(ctrl->dev);
 
@@ -1085,7 +1011,6 @@ static int fimc_release(struct file *filp)
 	}
 
 	if (ctrl->out) {
-		ctx = &ctrl->out->ctx[ctx_id];
 		if (ctx->status != FIMC_STREAMOFF) {
 			fimc_clk_en(ctrl, true);
 			ret = fimc_outdev_stop_streaming(ctrl, ctx);
@@ -1113,9 +1038,7 @@ static int fimc_release(struct file *filp)
 				ctx->src[i].flags = V4L2_BUF_FLAG_MAPPED;
 			}
 
-			if ((ctx->overlay.mode == FIMC_OVLY_DMA_AUTO ||
-				ctx->overlay.mode == FIMC_OVLY_NOT_FIXED) &&
-				 ctx->dst[0].base[FIMC_ADDR_Y] != 0) {
+			if (ctx->overlay.mode == FIMC_OVLY_DMA_AUTO) {
 				ctrl->mem.curr = ctx->dst[0].base[FIMC_ADDR_Y];
 
 				for (i = 0; i < FIMC_OUTBUFS; i++) {
@@ -1143,17 +1066,9 @@ static int fimc_release(struct file *filp)
 							__func__);
 			}
 		}
-		
-		memset(ctx, 0x00, sizeof(struct fimc_ctx));
-		
-		ctx->ctx_num = ctx_id;
-		ctx->overlay.mode = FIMC_OVLY_NOT_FIXED;
-		ctx->status = FIMC_STREAMOFF;
 
-		for (i = 0; i < FIMC_OUTBUFS; i++) {
-			ctx->inq[i] = -1;
-			ctx->outq[i] = -1;
-		}
+		ctrl->ctx_busy[ctx_id] = 0;
+		memset(ctx, 0x00, sizeof(struct fimc_ctx));
 
 		if (atomic_read(&ctrl->in_use) == 0) {
 			ctrl->status = FIMC_STREAMOFF;
@@ -1171,7 +1086,23 @@ static int fimc_release(struct file *filp)
 		}
 	}
 
-	ctrl->ctx_busy[ctx_id] = 0;
+	/*
+	 * it remain afterimage when I play movie using overlay and exit
+	 */
+	if (ctrl->fb.is_enable == 1) {
+		fimc_info2("WIN_OFF for FIMC%d\n", ctrl->id);
+		ret = fb_blank(registered_fb[ctx->overlay.fb_id],
+				FB_BLANK_POWERDOWN);
+		if (ret < 0) {
+			fimc_err("%s: fb_blank: fb[%d] " \
+					"mode=FB_BLANK_POWERDOWN\n",
+					__func__, ctx->overlay.fb_id);
+			ret = -EINVAL;
+			goto release_err;
+		}
+
+		ctrl->fb.is_enable = 0;
+	}
 
 	mutex_unlock(&ctrl->lock);
 
