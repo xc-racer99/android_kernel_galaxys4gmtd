@@ -8,7 +8,6 @@ exec >>boot.txt 2>&1
 busybox rm init
 busybox mount -t proc proc /proc
 busybox mount -t sysfs sysfs /sys
-busybox mount -t tmpfs tmpfs /tmp
 
 bml_over_mtd dump boot 72 reservoir 4012 /stage1/boot.bin
 
@@ -18,16 +17,11 @@ load_offset=$boot_offset
 load_len=$boot_len
 
 busybox mount -t yaffs2 /dev/block/mtdblock2 /system
-busybox mount -t yaffs2 /dev/block/mtdblock3 /data
-busybox mount -t yaffs2 /dev/block/mtdblock4 /cache
+busybox mount -t yaffs2 /dev/block/mtdblock5 /cache
 
-if busybox test -e /cache/.startrecovery || \
-	busybox test -e /data/.startrecovery || \
-	busybox grep -q bootmode=2 /proc/cmdline ; then
+if busybox test -e /data/.startrecovery || busybox grep -q bootmode=2 /proc/cmdline ; then
 	# recovery boot
 	busybox rm -fr /cache/.startrecovery
-	busybox rm -fr /data/.startrecovery
-
 	load_offset=$recovery_offset
 	load_len=$recovery_len
 
@@ -37,10 +31,10 @@ elif ! busybox test -e /system/build.prop ; then
 	# emergency boot
         busybox umount /cache
         erase_image cache
-        busybox mount -t yaffs2 /dev/block/mtdblock4 /cache
+        busybox mount -t yaffs2 /dev/block/mtdblock5 /cache
         busybox mkdir /cache/recovery
 
-	busybox mount -t vfat /dev/block/mmcblk0p1 /sdcard
+	busybox mount -t vfat /dev/block/mmcblk0p1 /sdcard	
 
 	UPDATE=$(busybox cat /sdcard/cyanogenmod.cfg)
 
@@ -56,7 +50,6 @@ elif ! busybox test -e /system/build.prop ; then
 fi
 
 busybox umount /cache
-busybox umount /data
 busybox umount /system
 busybox umount /sdcard
 busybox rmdir /sdcard
