@@ -35,8 +35,10 @@
 #define IOCTL_MFC_SET_CONFIG			0x00800101
 #define IOCTL_MFC_GET_CONFIG			0x00800102
 
+#define IOCTL_MFC_BUF_CACHE			0x00801000
+
 /* MFC H/W support maximum 32 extra DPB */
-#define MFC_MAX_EXTRA_DPB                      5
+#define MFC_MAX_EXTRA_DPB                      4
 
 #define ENC_PROFILE_LEVEL(profile, level)      ((profile) | ((level) << 8))
 
@@ -93,7 +95,7 @@ enum  ssbsip_mfc_dec_conf {
 	MFC_DEC_SETCONF_FRAME_TAG,
 	MFC_DEC_GETCONF_CRC_DATA,
 	MFC_DEC_GETCONF_BUF_WIDTH_HEIGHT,
-	MFC_DEC_GETCONF_CROP_INFO,
+	FC_DEC_GETCONF_CROP_INFO,
 	MFC_DEC_GETCONF_FRAME_TAG
 };
 
@@ -143,6 +145,8 @@ struct mfc_enc_init_mpeg4_arg {
 	int in_cb_pad_val;
 	int in_cr_pad_val;
 
+	int in_frame_map;                    /* [IN] Encoding input NV12 type linear(0) TILE(1)   */
+
 	unsigned int in_mapped_addr;
 	struct mfc_strm_ref_buf_arg out_u_addr;
 	struct mfc_strm_ref_buf_arg out_p_addr;
@@ -183,6 +187,8 @@ struct mfc_enc_init_h264_arg {
 	int in_luma_pad_val;                 /* [IN] Luma pel value used to fill padding area         */
 	int in_cb_pad_val;                   /* [IN] CB pel value used to fill padding area           */
 	int in_cr_pad_val;                   /* [IN] CR pel value used to fill padding area           */
+
+	int in_frame_map;                    /* [IN] Encoding input NV12 type linear(0) TILE(1)       */
 
 	unsigned int in_mapped_addr;
 	struct mfc_strm_ref_buf_arg out_u_addr;
@@ -302,6 +308,11 @@ struct mfc_mem_free_arg {
 	unsigned int u_addr;
 };
 
+enum mfc_buffer_type {
+	MFC_BUFFER_NO_CACHE = 0,
+	MFC_BUFFER_CACHE = 1
+};
+
 union mfc_args {
 	struct mfc_enc_init_mpeg4_arg enc_init_mpeg4;
 	struct mfc_enc_init_mpeg4_arg enc_init_h263;
@@ -318,6 +329,7 @@ union mfc_args {
 	struct mfc_mem_free_arg mem_free;
 	struct mfc_get_phys_addr_arg get_phys_addr;
 
+	enum mfc_buffer_type buf_type;
 };
 
 struct mfc_common_args {
