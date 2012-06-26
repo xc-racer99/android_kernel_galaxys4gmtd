@@ -177,7 +177,8 @@ enum audio_path	{
 #else 
 enum audio_path	{
 	OFF, RCV, SPK, HP, HP_NO_MIC, BT, SPK_HP,
-	EXTRA_DOCK_SPEAKER
+	EXTRA_DOCK_SPEAKER, RING_SPK, RING_HP,
+	RING_NO_MIC, RING_SPK_HP
 };
 #endif
 
@@ -196,6 +197,7 @@ enum fmradio_mix_path		{FMR_MIX_OFF, FMR_MIX_DUAL};
 enum power_state		{CODEC_OFF, CODEC_ON };
 enum input_source_state		{DEFAULT_INPUT, RECOGNITION, CAMCORDER, VOIP_INPUT};
 enum output_source_state	{DEFAULT_OUTPUT, RING_TONE, VOIP_OUTPUT};
+enum ringtone_state		{RING_OFF, RING_ON};
 enum vtcall_state		{VT_OFF, VT_ON};
 enum factory_test		{SEC_NORMAL, SEC_TEST_HWCODEC , SEC_TEST_15MODE, SEC_TEST_PBA_LOOPBACK};
 enum recognition		{REC_OFF, REC_ON};
@@ -244,6 +246,7 @@ struct wm8994_priv {
 	#if defined(CONFIG_S5PC110_DEMPSEY_BOARD) 
 	enum Ring_state Ring_state;
 	#endif
+	enum ringtone_state ringtone_active;
 	select_route *universal_playback_path;
 	select_route *universal_voicecall_path;
 	select_mic_route *universal_mic_path;
