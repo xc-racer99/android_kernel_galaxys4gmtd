@@ -332,7 +332,7 @@ static int wm899x_inpga_put_volsw_vu(struct snd_kcontrol *kcontrol,
 #if defined(CONFIG_S5PC110_DEMPSEY_BOARD)
 #define MAX_PLAYBACK_PATHS 13
 #else
-#define MAX_PLAYBACK_PATHS 8
+#define MAX_PLAYBACK_PATHS 12
 #endif
 #define MAX_VOICECALL_PATH 5
 
@@ -344,7 +344,7 @@ static const char *playback_path[] = {
 #else
 static const char *playback_path[] = {
 	"OFF", "RCV", "SPK", "HP", "HP_NO_MIC", "BT", "SPK_HP",
-	"EXTRA_DOCK_SPEAKER"
+	"EXTRA_DOCK_SPEAKER", "RING_SPK", "RING_HP", "RING_NO_MIC", "RING_SPK_HP"
 };
 #endif
 static const char *voicecall_path[] = {
@@ -511,6 +511,19 @@ static int wm8994_set_path(struct snd_kcontrol *kcontrol,
 	case SPK_HP:
 	case EXTRA_DOCK_SPEAKER:
 		DEBUG_LOG("routing to %s\n", mc->texts[path_num]);
+		wm8994->ringtone_active = RING_OFF;
+		break;
+	case RING_SPK:
+	case RING_HP:
+	case RING_NO_MIC:
+		DEBUG_LOG("routing to %s\n", mc->texts[path_num]);
+		wm8994->ringtone_active = RING_ON;
+		path_num -= 6;
+		break;
+	case RING_SPK_HP:
+		DEBUG_LOG("routing to %s\n", mc->texts[path_num]);
+		wm8994->ringtone_active = RING_ON;
+		path_num -= 5;
 		break;
 	#if defined(CONFIG_S5PC110_DEMPSEY_BOARD)		
 		case HDMI_TV_OUT:
@@ -1771,6 +1784,7 @@ void wm8994_shutdown(struct snd_pcm_substream *substream,
 		wm8994 ->call_record_path = CALL_RECORDING_OFF;		
 		wm8994 ->call_record_ch = CH_OFF;	
 #endif
+		wm8994->ringtone_active = RING_OFF;
 //[mook_GB : add in audience
 #if defined (CONFIG_S5PC110_KEPLER_BOARD)|| defined(CONFIG_S5PC110_DEMPSEY_BOARD)
 				A1026Sleep();
@@ -3561,6 +3575,7 @@ static int wm8994_init(struct wm8994_priv *wm8994_private,
 	#if defined(CONFIG_S5PC110_DEMPSEY_BOARD) 
 	wm8994->Ring_state=RING_OFF;
 	#endif
+	wm8994->ringtone_active = RING_OFF;
 	if (IS_ERR(wm8994->codec_clk)) {
 		pr_err("failed to get MCLK clock from AP\n");
 		ret = PTR_ERR(wm8994->codec_clk);
