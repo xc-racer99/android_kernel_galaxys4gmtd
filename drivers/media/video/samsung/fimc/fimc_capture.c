@@ -276,28 +276,13 @@ static int fimc_camera_start(struct fimc_control *ctrl)
 		if (ret != -ENOIOCTLCMD)
 			return ret;
 	} else {
-		if (vtmode == 1 && device_id != 0 && (ctrl->cap->rotate == 90 || ctrl->cap->rotate == 270)) {
-			ctrl->cam->window.left = 136;
-			ctrl->cam->window.top = 0;
-			ctrl->cam->window.width = 368;
-			ctrl->cam->window.height = 480;
-			ctrl->cam->width = cam_frmsize.discrete.width;
-			ctrl->cam->height = cam_frmsize.discrete.height;
-			dev_err(ctrl->dev, "vtmode = 1, rotate = %d, device = front, cam->width = %d, cam->height = %d\n", ctrl->cap->rotate, ctrl->cam->width, ctrl->cam->height);
-		} else if (device_id != 0 && vtmode != 1) {
-			ctrl->cam->window.left = 136;
-			ctrl->cam->window.top = 0;
-			ctrl->cam->window.width = 368;
-			ctrl->cam->window.height = 480;
-			ctrl->cam->width = cam_frmsize.discrete.width;
-			ctrl->cam->height = cam_frmsize.discrete.height;
-			dev_err(ctrl->dev, "%s, crop(368x480), vtmode = 0, device = front, cam->width = %d, cam->height = %d\n", __func__, ctrl->cam->width, ctrl->cam->height);
-		} else {		
-			ctrl->cam->window.left = 0;
-			ctrl->cam->window.top = 0;
-			ctrl->cam->window.width = ctrl->cam->width;
-			ctrl->cam->window.height = ctrl->cam->height;
-		}
+		ctrl->cam->width = cam_frmsize.discrete.width;
+		ctrl->cam->height = cam_frmsize.discrete.height;
+		
+		ctrl->cam->window.left = 0;
+		ctrl->cam->window.top = 0;
+		ctrl->cam->window.width = ctrl->cam->width;
+		ctrl->cam->window.height = ctrl->cam->height;
 	}
 
 	cam_ctrl.id = V4L2_CID_CAM_PREVIEW_ONOFF;
@@ -1679,28 +1664,10 @@ int fimc_streamon_capture(void *fh)
 		if(ret != -ENOIOCTLCMD)
 			return ret;
 	} else {
-		if (vtmode == 1 && device_id != 0 && (cap->rotate == 90 || cap->rotate == 270)) {
-		ctrl->cam->window.left = 136;
-			ctrl->cam->window.top = 0;//
-			ctrl->cam->window.width = 368;
-			ctrl->cam->window.height = 480;
-			ctrl->cam->width = cam_frmsize.discrete.width;
-			ctrl->cam->height = cam_frmsize.discrete.height;
-			dev_err(ctrl->dev, "vtmode = 1, rotate = %d, device = front, cam->width = %d, cam->height = %d\n", cap->rotate, ctrl->cam->width, ctrl->cam->height);
-		} else if (device_id != 0 && vtmode != 1) {
-			ctrl->cam->window.left = 136;
-			ctrl->cam->window.top = 0;
-			ctrl->cam->window.width = 368;
-			ctrl->cam->window.height = 480;
-			ctrl->cam->width = cam_frmsize.discrete.width;
-			ctrl->cam->height =cam_frmsize.discrete.height;
-			dev_err(ctrl->dev, "%s, crop(368x480), vtmode = 0, device = front, cam->width = %d, cam->height = %d\n", __func__, ctrl->cam->width, ctrl->cam->height);
-		} else {
-			ctrl->cam->window.left = 0;
-			ctrl->cam->window.top = 0;
-			ctrl->cam->width = ctrl->cam->window.width = cam_frmsize.discrete.width;
-			ctrl->cam->height = ctrl->cam->window.height = cam_frmsize.discrete.height;
-		}
+		ctrl->cam->window.left = 0;
+		ctrl->cam->window.top = 0;
+		ctrl->cam->width = ctrl->cam->window.width = cam_frmsize.discrete.width;
+		ctrl->cam->height = ctrl->cam->window.height = cam_frmsize.discrete.height;
 	}
 
 #ifndef CONFIG_VIDEO_FIMC_MIPI //NAGSM_ANDROID_HQ_CAMERA_SoojinKim_20110527 : prevent kernel panic
