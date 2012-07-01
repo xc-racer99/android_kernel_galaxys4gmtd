@@ -2964,11 +2964,15 @@ void TSP_forced_release(void)
 
         fingerInfo[i].pressure = 0;
 
+	if (fingerInfo[i].pressure > 0) {
         input_report_abs(qt602240->input_dev, ABS_MT_POSITION_X, fingerInfo[i].x);
         input_report_abs(qt602240->input_dev, ABS_MT_POSITION_Y, fingerInfo[i].y);
-        input_report_abs(qt602240->input_dev, ABS_MT_TOUCH_MAJOR, fingerInfo[i].pressure);    // 0이면 Release, 아니면 Press 상태(Down or Move)
-        input_report_abs(qt602240->input_dev, ABS_MT_WIDTH_MAJOR, fingerInfo[i].size);   
+        input_report_abs(qt602240->input_dev, ABS_MT_PRESSURE, fingerInfo[i].pressure);    // 0이면 Release, 아니면 Press 상태(Down or Move)
+        input_report_abs(qt602240->input_dev, ABS_MT_TOUCH_MAJOR, fingerInfo[i].size);   
 	input_report_abs(qt602240->input_dev, ABS_MT_TRACKING_ID, i); // i = Finger ID 
+	input_report_abs(qt602240->input_dev, BTN_TOUCH, 1);
+	}
+
         input_mt_sync(qt602240->input_dev);
 
         if ( fingerInfo[i].pressure == 0 ) fingerInfo[i].pressure= -1;
@@ -2994,11 +2998,15 @@ void TSP_forced_release_forOKkey(void)
 
         fingerInfo[i].pressure = 0;
 
+	if (fingerInfo[i].pressure > 0) {
         input_report_abs(qt602240->input_dev, ABS_MT_POSITION_X, fingerInfo[i].x);
         input_report_abs(qt602240->input_dev, ABS_MT_POSITION_Y, fingerInfo[i].y);
-        input_report_abs(qt602240->input_dev, ABS_MT_TOUCH_MAJOR, fingerInfo[i].pressure);    // 0이면 Release, 아니면 Press 상태(Down or Move)
-        input_report_abs(qt602240->input_dev, ABS_MT_WIDTH_MAJOR, fingerInfo[i].size); 
+        input_report_abs(qt602240->input_dev, ABS_MT_PRESSURE, fingerInfo[i].pressure);    // 0이면 Release, 아니면 Press 상태(Down or Move)
+        input_report_abs(qt602240->input_dev, ABS_MT_TOUCH_MAJOR, fingerInfo[i].size); 
 	input_report_abs(qt602240->input_dev, ABS_MT_TRACKING_ID, i); // i = Finger ID 
+	input_report_abs(qt602240->input_dev, BTN_TOUCH, 1);
+	}
+
         input_mt_sync(qt602240->input_dev);
 
         if ( fingerInfo[i].pressure == 0 ) fingerInfo[i].pressure= -1;
@@ -3071,11 +3079,15 @@ void  get_message(void)
                             touch_state_val=0;
                         }
                         fingerInfo[i].pressure= 0;
+			if (fingerInfo[i].pressure > 0) {
                         input_report_abs(qt602240->input_dev, ABS_MT_POSITION_X, fingerInfo[i].x);
                         input_report_abs(qt602240->input_dev, ABS_MT_POSITION_Y, fingerInfo[i].y);
-                        input_report_abs(qt602240->input_dev, ABS_MT_TOUCH_MAJOR, fingerInfo[i].pressure);    // 0이면 Release, 아니면 Press 상태(Down or Move)
-                        input_report_abs(qt602240->input_dev, ABS_MT_WIDTH_MAJOR, fingerInfo[i].size);
+                        input_report_abs(qt602240->input_dev, ABS_MT_PRESSURE, fingerInfo[i].pressure);    // 0이면 Release, 아니면 Press 상태(Down or Move)
+                        input_report_abs(qt602240->input_dev, ABS_MT_TOUCH_MAJOR, fingerInfo[i].size);
 				input_report_abs(qt602240->input_dev, ABS_MT_TRACKING_ID, i); // i = Finger ID 
+			input_report_key(qt602240->input_dev, BTN_TOUCH, 1);
+			}
+
                         input_mt_sync(qt602240->input_dev);
             
                         if ( fingerInfo[i].pressure == 0 ) fingerInfo[i].pressure= -1;
@@ -3094,11 +3106,14 @@ void  get_message(void)
                             touch_state_val=0;
                         }
                         fingerInfo[i].pressure= 0;
+			if (fingerInfo[i].pressure > 0) {
                         input_report_abs(qt602240->input_dev, ABS_MT_POSITION_X, fingerInfo[i].x);
                         input_report_abs(qt602240->input_dev, ABS_MT_POSITION_Y, fingerInfo[i].y);
-                        input_report_abs(qt602240->input_dev, ABS_MT_TOUCH_MAJOR, fingerInfo[i].pressure);    // 0이면 Release, 아니면 Press 상태(Down or Move)
-                        input_report_abs(qt602240->input_dev, ABS_MT_WIDTH_MAJOR, fingerInfo[i].size);
+                        input_report_abs(qt602240->input_dev, ABS_MT_PRESSURE, fingerInfo[i].pressure);    // 0이면 Release, 아니면 Press 상태(Down or Move)
+                        input_report_abs(qt602240->input_dev, ABS_MT_TOUCH_MAJOR, fingerInfo[i].size);
 				input_report_abs(qt602240->input_dev, ABS_MT_TRACKING_ID, i); // i = Finger ID 
+			input_report_key(qt602240->input_dev, BTN_TOUCH, 1);
+			}
                         input_mt_sync(qt602240->input_dev);
             
                         if ( fingerInfo[i].pressure == 0 ) fingerInfo[i].pressure= -1;
@@ -3379,11 +3394,14 @@ void  get_message(void)
 		if ( fingerInfo[i].x == 0 ) 
 			fingerInfo[i].x = 1; 
 #endif
+	    if (fingerInfo[i].pressure > 0) {
             input_report_abs(qt602240->input_dev, ABS_MT_POSITION_X, fingerInfo[i].x);
             input_report_abs(qt602240->input_dev, ABS_MT_POSITION_Y, fingerInfo[i].y);
-            input_report_abs(qt602240->input_dev, ABS_MT_TOUCH_MAJOR, fingerInfo[i].pressure);    // 0이면 Release, 아니면 Press 상태(Down or Move)
-            input_report_abs(qt602240->input_dev, ABS_MT_WIDTH_MAJOR, fingerInfo[i].size);
+            input_report_abs(qt602240->input_dev, ABS_MT_PRESSURE, fingerInfo[i].pressure);    // 0이면 Release, 아니면 Press 상태(Down or Move)
+            input_report_abs(qt602240->input_dev, ABS_MT_TOUCH_MAJOR, fingerInfo[i].size);
 		input_report_abs(qt602240->input_dev, ABS_MT_TRACKING_ID, i); // i = Finger ID 
+	    input_report_key(qt602240->input_dev, BTN_TOUCH, 1);
+	    }
             input_mt_sync(qt602240->input_dev);
 
             if ( fingerInfo[i].pressure == 0 ) fingerInfo[i].pressure= -1;
@@ -3716,8 +3734,8 @@ int qt602240_probe(struct i2c_client *client,
     input_set_abs_params(qt602240->input_dev, ABS_PRESSURE, 0, 255, 0, 0);
     input_set_abs_params(qt602240->input_dev, ABS_TOOL_WIDTH, 0, 15, 0, 0);
 #ifdef _SUPPORT_MULTITOUCH_
-    input_set_abs_params(qt602240->input_dev, ABS_MT_TOUCH_MAJOR, 0, 255, 0, 0);
-    input_set_abs_params(qt602240->input_dev, ABS_MT_WIDTH_MAJOR, 0, 30, 0, 0);
+    input_set_abs_params(qt602240->input_dev, ABS_MT_PRESSURE, 0, 255, 0, 0);
+    input_set_abs_params(qt602240->input_dev, ABS_MT_TOUCH_MAJOR, 0, 30, 0, 0);
 	input_set_abs_params(qt602240->input_dev, ABS_MT_TRACKING_ID, 0, MAX_USING_FINGER_NUM-1, 0, 0);
 
 #endif    
