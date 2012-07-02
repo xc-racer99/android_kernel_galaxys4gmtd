@@ -5346,55 +5346,9 @@ static int ce147_init(struct v4l2_subdev *sd, u32 val)
 
 	return 0;
 }
-#if 0
-/*
- * s_config subdev ops
- * With camera device, we need to re-initialize every single opening time
- * therefor, it is not necessary to be initialized on probe time.
- * except for version checking
- * NOTE: version checking is optional
- */
-static int ce147_s_config(struct v4l2_subdev *sd, int irq, void *platform_data)
-{
-	struct i2c_client *client = v4l2_get_subdevdata(sd);
-	struct ce147_state *state = to_state(sd);
-	struct ce147_platform_data *pdata;
 
-	pdata =	client->dev.platform_data;
-
-	if (!pdata) {
-		dev_err(&client->dev, "%s: no platform data\n", __func__);
-		return -ENODEV;
-	}
-
-	/*
-	 * Assign default format and resolution
-	 * Use configured default information in platform data
-	 * or without them, use default information in driver
-	 */
-	if (!(pdata->default_width && pdata->default_height)) {
-		/* TODO: assign driver default resolution */
-	} else {
-		state->pix.width = pdata->default_width;
-		state->pix.height = pdata->default_height;
-	}
-
-	if (!pdata->pixelformat)
-		state->pix.pixelformat = DEFAULT_PIX_FMT;
-	else
-		state->pix.pixelformat = pdata->pixelformat;
-
-	if (!pdata->freq)
-		state->freq = DEFAULT_MCLK;	/* 24MHz default */
-	else
-		state->freq = pdata->freq;
-
-	return 0;
-}
-#endif
 static const struct v4l2_subdev_core_ops ce147_core_ops = {
 	.init		= ce147_init,		/* initializing API */
-	//.s_config	= ce147_s_config,	/* Fetch platform data */
 	.queryctrl	= ce147_queryctrl,
 	.querymenu	= ce147_querymenu,
 	.g_ctrl		= ce147_g_ctrl,
