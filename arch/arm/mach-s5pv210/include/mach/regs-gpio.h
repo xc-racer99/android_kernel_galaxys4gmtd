@@ -75,22 +75,6 @@
 #define S5PV210_ETC2_BASE		(S5P_VA_GPIO + 0x640)
 #define S5PV210_ETC4_BASE		(S5P_VA_GPIO + 0x660)
 
-#if defined(CONFIG_S5PC110_DEMPSEY_BOARD)
-#define S5PV210_GPJ1CON                 (S5PV210_GPJ1_BASE + 0x00) 
-#define S5PV210_GPJ1DAT                 (S5PV210_GPJ1_BASE + 0x04)
-#define S5PV210_GPJ1PUD                 (S5PV210_GPJ1_BASE + 0x08)
-#define S5PV210_GPJ1DRV                 (S5PV210_GPJ1_BASE + 0x0c)
-#define S5PV210_GPJ1CONPDN              (S5PV210_GPJ1_BASE + 0x10)
-#define S5PV210_GPJ1PUDPDN              (S5PV210_GPJ1_BASE + 0x14)
-
-#define S5PV210_GPJ2CON                 (S5PV210_GPJ2_BASE + 0x00)
-#define S5PV210_GPJ2DAT                 (S5PV210_GPJ2_BASE + 0x04)
-#define S5PV210_GPJ2PUD                 (S5PV210_GPJ2_BASE + 0x08)
-#define S5PV210_GPJ2DRV                 (S5PV210_GPJ2_BASE + 0x0c)
-#define S5PV210_GPJ2CONPDN              (S5PV210_GPJ2_BASE + 0x10)
-#define S5PV210_GPJ2PUDPDN              (S5PV210_GPJ2_BASE + 0x14)
-#endif
-
 #define S5PV210_GPA0_INT_CON		(S5P_VA_GPIO + 0x700)
 #define S5PV210_GPA0_INT_FLTCON0		(S5P_VA_GPIO + 0x800)
 #define S5PV210_GPA0_INT_FLTCON1		(S5P_VA_GPIO + 0x804)

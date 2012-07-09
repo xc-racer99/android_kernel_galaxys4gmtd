@@ -54,17 +54,7 @@
 #include <mach/regs-clock.h>
 #include <mach/gpio.h>
 #include <mach/gpio-aries.h>
-#if defined (CONFIG_S5PC110_KEPLER_BOARD)
-#include <mach/gpio-settings-kepler.h>
-#elif  defined (CONFIG_S5PC110_HAWK_BOARD)
-#include <mach/gpio-settings-hawk.h>
-#elif  defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD)
-#include <mach/gpio-settings-vibrantplus.h>
-#elif  defined(CONFIG_S5PC110_DEMPSEY_BOARD)				// MR work
-#include <mach/gpio-settings-dempsey.h>
-#else
 #include <mach/gpio-settings.h>
-#endif
 #include <mach/adc.h>
 #if defined(CONFIG_S5PC110_DEMPSEY_BOARD)
 #if defined (CONFIG_FB_S3C_LDI)
