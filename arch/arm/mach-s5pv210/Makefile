@@ -32,11 +32,7 @@ obj-$(CONFIG_MACH_HERRING)	+= herring-panel.o
 
 #obj-$(CONFIG_MACH_HERRING)	+= dev-herring-phone.o
 
-ifeq ($(CONFIG_S5PC110_DEMPSEY_BOARD), y)
-obj-$(CONFIG_MACH_ARIES)	+= mach-aries.o dempsey-rfkill.o
-else
 obj-$(CONFIG_MACH_ARIES)	+= mach-aries.o aries-rfkill.o
-endif
 obj-$(CONFIG_MACH_ARIES)	+= aries-vibrator.o
 obj-$(CONFIG_MACH_ARIES)	+= aries-btlpm.o
 obj-$(CONFIG_MACH_ARIES)	+= aries-watchdog.o
@@ -45,14 +41,7 @@ obj-$(CONFIG_MACH_ARIES)        += sec_switch.o
 
 obj-$(CONFIG_MACH_ARIES)	+= dev-s1-phone.o
 
-ifeq ($(CONFIG_S5PC110_DEMPSEY_BOARD), y)
-ifeq ($(CONFIG_CPU_FREQ),y)
-obj-$(CONFIG_CPU_S5PV210)		+= cpu-freq_c110b.o
-obj-$(CONFIG_CPU_S5PV210_B)		+= cpu-freq_c110b.o
-endif
-else
 obj-$(CONFIG_CPU_FREQ)		+= cpu-freq.o
-endif
 
 obj-$(CONFIG_S5PV210_SETUP_SDHCI)       += setup-sdhci.o
 
