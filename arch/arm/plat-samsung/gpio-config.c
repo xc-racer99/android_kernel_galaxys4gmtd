@@ -80,7 +80,6 @@ int s3c_gpio_setpull(unsigned int pin, s3c_gpio_pull_t pull)
 }
 EXPORT_SYMBOL(s3c_gpio_setpull);
 
-//+gingerbread_CG2900
 s3c_gpio_pull_t s3c_gpio_getpin(unsigned int pin)
 {
 	struct s3c_gpio_chip *chip = s3c_gpiolib_getchip(pin);
@@ -102,9 +101,6 @@ s3c_gpio_pull_t s3c_gpio_getpin(unsigned int pin)
 }
 
 EXPORT_SYMBOL(s3c_gpio_getpin);
-//-gingerbread_CG2900
-
-
 
 int s3c_gpio_setpin(unsigned int pin, s3c_gpio_pull_t level)
 {

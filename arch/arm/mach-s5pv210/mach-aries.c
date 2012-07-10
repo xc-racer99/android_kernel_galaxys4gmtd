@@ -113,9 +113,7 @@
 #include <plat/fb.h>
 #include <plat/mfc.h>
 #include <plat/iic.h>
-//+CG2900_GingerBread
 #include <plat/gpio-cfg.h>
-//-CG2900_GingerBread
 #include <plat/pm.h>
 #include <plat/regs-fimc.h>
 #include <plat/csis.h>
@@ -300,11 +298,7 @@ static struct s3c2410_uartcfg aries_uartcfgs[] __initdata = {
 		.ucon		= S5PV210_UCON_DEFAULT,
 		.ulcon		= S5PV210_ULCON_DEFAULT,
 #if defined(CONFIG_S5PC110_T959_BOARD) || defined(CONFIG_S5PC110_HAWK_BOARD) || defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD) || defined(CONFIG_S5PC110_DEMPSEY_BOARD)
-#ifdef CONFIG_GPS_CHIPSET_STE_CG2900 /* STE for CG2900 */
-                .ufcon		 = S3C2410_UFCON_FIFOMODE | S5PV210_UFCON_TXTRIG64 | S5PV210_UFCON_RXTRIG8, // -> RX trigger leve : 8byte.
-#else
 		.ufcon		 = S3C2410_UFCON_FIFOMODE | S5PV210_UFCON_TXTRIG64 | S5PV210_UFCON_RXTRIG1, // -> RX trigger leve : 8byte.
-#endif
 #else
 		.ufcon		= S5PV210_UFCON_DEFAULT,
 #endif 
@@ -7854,11 +7848,7 @@ static void __init aries_machine_init(void)
 
 	aries_switch_init();
 	
-#if ! defined (CONFIG_GPS_CHIPSET_STE_CG2900)
-#if !defined(CONFIG_ARIES_NTT)
 	gps_gpio_init();
-#endif
-#endif
 
 	aries_init_wifi_mem();
 
@@ -8014,16 +8004,6 @@ void s3c_setup_uart_cfg_gpio(unsigned char port)
 		s3c_gpio_slp_setpull_updown(GPIO_BT_RTS, S3C_GPIO_PULL_NONE);
 		break;
 	case 1:
-#ifdef CONFIG_GPS_CHIPSET_STE_CG2900 /* STE for CG2900 */
-		s3c_gpio_cfgpin(GPIO_GPS_RXD, S3C_GPIO_SFN(GPIO_GPS_RXD_AF));
-		s3c_gpio_setpull(GPIO_GPS_RXD, S3C_GPIO_PULL_NONE);// up -> none
-		s3c_gpio_cfgpin(GPIO_GPS_TXD, S3C_GPIO_SFN(GPIO_GPS_TXD_AF));
-		s3c_gpio_setpull(GPIO_GPS_TXD, S3C_GPIO_PULL_NONE);
-		s3c_gpio_cfgpin(GPIO_GPS_CTS, S3C_GPIO_SFN(GPIO_GPS_CTS_AF));
-		s3c_gpio_setpull(GPIO_GPS_CTS, S3C_GPIO_PULL_NONE);
-		s3c_gpio_cfgpin(GPIO_GPS_RTS, S3C_GPIO_SFN(GPIO_GPS_RTS_AF));
-		s3c_gpio_setpull(GPIO_GPS_RTS, S3C_GPIO_PULL_NONE);
-#else
 		s3c_gpio_cfgpin(GPIO_GPS_RXD, S3C_GPIO_SFN(GPIO_GPS_RXD_AF));
 		s3c_gpio_setpull(GPIO_GPS_RXD, S3C_GPIO_PULL_UP);
 		s3c_gpio_cfgpin(GPIO_GPS_TXD, S3C_GPIO_SFN(GPIO_GPS_TXD_AF));
@@ -8032,7 +8012,6 @@ void s3c_setup_uart_cfg_gpio(unsigned char port)
 		s3c_gpio_setpull(GPIO_GPS_CTS, S3C_GPIO_PULL_NONE);
 		s3c_gpio_cfgpin(GPIO_GPS_RTS, S3C_GPIO_SFN(GPIO_GPS_RTS_AF));
 		s3c_gpio_setpull(GPIO_GPS_RTS, S3C_GPIO_PULL_NONE);
-#endif
 		break;
 	case 2:
 		s3c_gpio_cfgpin(GPIO_AP_RXD, S3C_GPIO_SFN(GPIO_AP_RXD_AF));
@@ -8051,54 +8030,3 @@ void s3c_setup_uart_cfg_gpio(unsigned char port)
 	}
 }
 EXPORT_SYMBOL(s3c_setup_uart_cfg_gpio);
-#if defined (CONFIG_GPS_CHIPSET_STE_CG2900)  /* STE for CG2900 */
-void cg29xx_uart_disable(void)
-{
-	printk("cg29xx_uart_disable");
-	/* Set TXD to LOW to apply the BREAK condition */
-	s3c_gpio_cfgpin(GPIO_GPS_TXD, S3C_GPIO_OUTPUT);
-	s3c_gpio_setpull(GPIO_GPS_TXD, S3C_GPIO_PULL_DOWN);
-	gpio_set_value(GPIO_GPS_TXD, 0);
-//	s3c_gpio_setpin(GPIO_GPS_TXD, 0);  Kernel Panic
-}
-EXPORT_SYMBOL(cg29xx_uart_disable);
-
-void cg29xx_uart_enable(void)
-{
-	printk("cg29xx_uart_enable");
-	s3c_setup_uart_cfg_gpio(1);
-}		
-EXPORT_SYMBOL(cg29xx_uart_enable);
-void cg29xx_rts_gpio_control(int flag)
-{
-	printk("cg29xx_rts_gpio_control %d\n", flag);
-	if(flag)
-	{
-		/* Enable back the the RTS Flow by making HOST_RTS high */
-		s3c_gpio_cfgpin(GPIO_GPS_RTS, S3C_GPIO_OUTPUT);
-		s3c_gpio_setpull(GPIO_GPS_RTS, S3C_GPIO_PULL_DOWN);
-		gpio_set_value(GPIO_GPS_RTS, 0);
-//		s3c_gpio_setpin(GPIO_GPS_RTS, 0); Kernel Panic
-	}
-	else
-	{
-		/* Disable the RTS Flow by making HOST_RTS high */
-		s3c_gpio_cfgpin(GPIO_GPS_RTS, S3C_GPIO_OUTPUT);
-		s3c_gpio_setpull(GPIO_GPS_RTS, S3C_GPIO_PULL_UP);
-		gpio_set_value(GPIO_GPS_RTS, 1);
-//		s3c_gpio_setpin(GPIO_GPS_RTS, 1); Kernel Panic
-	}		
-		
-}
-EXPORT_SYMBOL(cg29xx_rts_gpio_control);
-int cg29xx_cts_gpio_level(void)
-{
-	return gpio_get_value(GPIO_GPS_CTS);
-}
-EXPORT_SYMBOL(cg29xx_cts_gpio_level);
-int cg29xx_cts_gpio_pin_number(void)
-{
-	return GPIO_GPS_CTS;
-}
-EXPORT_SYMBOL(cg29xx_cts_gpio_pin_number);
-#endif
