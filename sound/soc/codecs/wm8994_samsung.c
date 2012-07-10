@@ -45,22 +45,6 @@
 #include "wm8994_voodoo.h"
 #endif
 
-//[mook_GB : add in audience
-#ifdef CONFIG_KEPLER_AUDIO_A1026
-#if defined (CONFIG_S5PC110_DEMPSEY_BOARD)
-#include "A1026_regs_dempsey.h"
-#include "A1026_dev.h"
-#include "A1026_i2c_drv.h"
-
-#else
-#include "A1026_regs.h"
-#include "A1026_dev.h"
-#include "A1026_i2c_drv.h"
-//#include "audience.h"
-#endif
-#endif
-//]mook_GB : add in audience
-
 #if defined USE_INFINIEON_EC_FOR_VT
 #include "../s3c24xx/s3c-pcmdev.h"
 #endif
