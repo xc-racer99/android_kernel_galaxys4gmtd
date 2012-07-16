@@ -203,14 +203,14 @@ static int s3c_wrpdma_pcm_new(struct snd_card *card,
 		struct snd_soc_dai *dai, struct snd_pcm *pcm)
 {
 	struct snd_soc_platform *gdma_platform;
-#if defined(CONFIG_S5P_INTERNAL_DMA) || defined(CONFIG_SND_S5P_RP)
+#ifdef CONFIG_S5P_INTERNAL_DMA
 	struct snd_soc_platform *idma_platform;
 #endif
 
 	/* sec_fifo i/f always use internal h/w buffers
 	 * irrespective of the xfer method (iDMA or SysDMA) */
 
-#if defined(CONFIG_S5P_INTERNAL_DMA) || defined(CONFIG_SND_S5P_RP)
+#ifdef CONFIG_S5P_INTERNAL_DMA
 	idma_platform = &idma_soc_platform;
 	if (idma_platform->pcm_new)
 		idma_platform->pcm_new(card, dai, pcm);
