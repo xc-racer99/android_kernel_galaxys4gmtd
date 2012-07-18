@@ -87,6 +87,7 @@ static void s3c_dma_enqueue(struct snd_pcm_substream *substream)
 	pr_debug("%s: loaded %d, limit %d\n",
 				__func__, prtd->dma_loaded, limit);
 
+	
 	while (prtd->dma_loaded < limit) {
 		unsigned long len = prtd->dma_period;
 
@@ -109,7 +110,6 @@ static void s3c_dma_enqueue(struct snd_pcm_substream *substream)
 		} else
 			break;
 	}
-
 	prtd->dma_pos = pos;
 }
 
@@ -448,7 +448,7 @@ static int s3c_dma_new(struct snd_card *card,
 		card->dev->dma_mask = &s3c_dma_mask;
 	if (!card->dev->coherent_dma_mask)
 		card->dev->coherent_dma_mask = 0xffffffff;
-#ifndef CONFIG_S5P_INTERNAL_DMA
+#if !defined(CONFIG_S5P_INTERNAL_DMA) || defined(CONFIG_SND_S5P_RP)
 	if (dai->playback.channels_min) {
 		ret = s3c_preallocate_dma_buffer(pcm,
 			SNDRV_PCM_STREAM_PLAYBACK);
@@ -473,6 +473,18 @@ struct snd_soc_platform s3c24xx_soc_platform = {
 	.pcm_free	= s3c_dma_free_dma_buffers,
 };
 EXPORT_SYMBOL_GPL(s3c24xx_soc_platform);
+
+static int __init s3c24xx_soc_platform_init(void)
+{
+	return snd_soc_register_platform(&s3c24xx_soc_platform);
+}
+module_init(s3c24xx_soc_platform_init);
+
+static void __exit s3c24xx_soc_platform_exit(void)
+{
+	snd_soc_unregister_platform(&s3c24xx_soc_platform);
+}
+module_exit(s3c24xx_soc_platform_exit);
 
 MODULE_AUTHOR("Ben Dooks, <ben@simtec.co.uk>");
 MODULE_DESCRIPTION("Samsung S3C Audio DMA module");
