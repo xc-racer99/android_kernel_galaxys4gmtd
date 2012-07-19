@@ -456,15 +456,13 @@ static struct clk init_clocks_disable[] = {
 		.parent		= &clk_pclk_psys.clk,
 		.enable		= s5pv210_clk_ip3_ctrl,
 		.ctrlbit	= (1<<14),
-	}, 
-	{
+	}, {
 		.name		= "timers",
 		.id		= -1,
 		.parent		= &clk_pclk_psys.clk,
 		.enable		= s5pv210_clk_ip3_ctrl,
 		.ctrlbit	= (1<<23),
-	}, 
-	{
+	}, {
 		.name		= "adc",
 		.id		= -1,
 		.parent		= &clk_pclk_psys.clk,
