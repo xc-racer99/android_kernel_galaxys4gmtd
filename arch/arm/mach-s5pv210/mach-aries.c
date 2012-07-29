@@ -2563,12 +2563,12 @@ static void set_shared_mic_bias(void)
 	else
 	{
 		gpio_set_value(GPIO_MICBIAS_EN, wm8994_mic_bias);   // GPJ4(2)
-		gpio_set_value(GPIO_EARMICBIAS_EN, jack_mic_bias);	// GPJ4(4) : Use earMicbias since hwrev-0.5
+		gpio_set_value(GPIO_EAR_MICBIAS_EN, jack_mic_bias);	// GPJ4(4) : Use earMicbias since hwrev-0.5
 		gpio_set_value(GPIO_EARPATH_SEL, wm8994_mic_bias || jack_mic_bias);
 	}
 #elif defined (CONFIG_S5PC110_DEMPSEY_BOARD) 	
 	gpio_set_value(GPIO_MICBIAS_EN, wm8994_mic_bias);   	// GPJ4(2)
-	gpio_set_value(GPIO_EARMICBIAS_EN, jack_mic_bias);	// GPJ4(4) : Use earMicbias since hwrev-0.5
+	gpio_set_value(GPIO_EAR_MICBIAS_EN, jack_mic_bias);	// GPJ4(4) : Use earMicbias since hwrev-0.5
 	gpio_set_value(GPIO_EARPATH_SEL, wm8994_mic_bias || jack_mic_bias);
 	
 #elif defined(CONFIG_S5PC110_HAWK_BOARD)|| defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD)
@@ -7030,8 +7030,8 @@ void config_sleep_gpio(void)
 	printk(KERN_DEBUG "SLPGPIO : CODEC_LDO_EN(%d) MICBIAS_EN(%d) EARPATH_SEL(%d)\n",
 		gpio_get_value(GPIO_CODEC_LDO_EN), gpio_get_value(GPIO_MICBIAS_EN), gpio_get_value(GPIO_EARPATH_SEL));
 #if !defined(CONFIG_S5PC110_DEMPSEY_BOARD)
-	printk(KERN_DEBUG "SLPGPIO : PS_ON(%d) FM_RST(%d) UART_SEL(%d)\n",
-		gpio_get_value(GPIO_PS_ON), gpio_get_value(GPIO_FM_RST), gpio_get_value(GPIO_UART_SEL));
+	printk(KERN_DEBUG "SLPGPIO : PS_ON(%d) GPIO_MICBIAS_EN2(%d) UART_SEL(%d)\n",
+		gpio_get_value(GPIO_PS_ON), gpio_get_value(GPIO_MICBIAS_EN2), gpio_get_value(GPIO_UART_SEL));
 #else
 	printk(KERN_DEBUG "SLPGPIO : UART_SEL(%d)\n", gpio_get_value(GPIO_UART_SEL));
 #endif
@@ -7569,7 +7569,7 @@ static void __init sound_init(void)
 
 #if defined(CONFIG_S5PC110_KEPLER_BOARD) || defined (CONFIG_S5PC110_DEMPSEY_BOARD) 	
 	gpio_request(GPIO_MICBIAS_EN, "micbias_enable");
-	gpio_request(GPIO_EARMICBIAS_EN, "sub_micbias_enable");	
+	gpio_request(GPIO_EAR_MICBIAS_EN, "sub_micbias_enable");
 #elif defined(CONFIG_S5PC110_HAWK_BOARD)
   	gpio_request(GPIO_MICBIAS_EN,  "micbias_enable");		 // GPJ4(2)
 	gpio_request(GPIO_MICBIAS_EN2, "sub_micbias_enable"); // GPJ2(5)
