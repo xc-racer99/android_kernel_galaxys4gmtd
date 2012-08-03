@@ -194,12 +194,19 @@ config CPU_FREQ_GOV_SMARTASS2
 	tristate "'smartass2' cpufreq governor"
 	depends on CPU_FREQ
 	help
-	  'smartass2' - Yet another governor, sometimes called smartassv2
+
+	  'smartass2' - SmartassV2 is a governor (controls the
+	  frequency of the CPU at each give moment) which, like the
+	  first smartass, is generally based on the implementation of
+	  interactive with some major changes and the addition of a
+	  built in sleep profile (behaves a bit differently when
+	  screen is off vs. on).
 
 	  To compile this driver as a module, choose M here: the
 	  module will be called cpufreq_smartass2.
 
-	  For details, take a look at linux/Documentation/cpu-freq.
+	  For details, take a look at linux/Documentation/cpu-freq and
+	  http://forum.xda-developers.com/showthread.php?t=730471
 
 	  If in doubt, say N.
 
