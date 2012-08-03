@@ -190,4 +190,17 @@ config CPU_FREQ_GOV_CONSERVATIVE
 
 	  If in doubt, say N.
 
+config CPU_FREQ_GOV_SMARTASS2
+	tristate "'smartass2' cpufreq governor"
+	depends on CPU_FREQ
+	help
+	  'smartass2' - Yet another governor, sometimes called smartassv2
+
+	  To compile this driver as a module, choose M here: the
+	  module will be called cpufreq_smartass2.
+
+	  For details, take a look at linux/Documentation/cpu-freq.
+
+	  If in doubt, say N.
+
 endif	# CPU_FREQ
