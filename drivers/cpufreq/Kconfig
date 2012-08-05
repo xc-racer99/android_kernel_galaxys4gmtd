@@ -110,6 +110,16 @@ config CPU_FREQ_DEFAULT_GOV_CONSERVATIVE
 	  Be aware that not all cpufreq drivers support the conservative
 	  governor. If unsure have a look at the help section of the
 	  driver. Fallback governor will be the performance governor.
+
+config CPU_FREQ_DEFAULT_GOV_SMARTASSV2
+	bool "smartassv2"
+	select CPU_FREQ_GOV_SMARTASSV2
+	select CPU_FREQ_GOV_PERFORMANCE
+	help
+	  Use the CPUFreq governor 'smartassv2' as default. This governor
+	  tries to reduce power consumption by having a "sleep" profile
+	  as well as an "awake" profile.
+
 endchoice
 
 config CPU_FREQ_GOV_PERFORMANCE
@@ -190,12 +200,12 @@ config CPU_FREQ_GOV_CONSERVATIVE
 
 	  If in doubt, say N.
 
-config CPU_FREQ_GOV_SMARTASS2
-	tristate "'smartass2' cpufreq governor"
+config CPU_FREQ_GOV_SMARTASSV2
+	tristate "'smartassv2' cpufreq governor"
 	depends on CPU_FREQ
 	help
 
-	  'smartass2' - SmartassV2 is a governor (controls the
+	  'smartassv2' - smartassv2 is a governor (controls the
 	  frequency of the CPU at each give moment) which, like the
 	  first smartass, is generally based on the implementation of
 	  interactive with some major changes and the addition of a
