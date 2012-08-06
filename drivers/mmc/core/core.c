@@ -40,7 +40,6 @@
 
 static struct workqueue_struct *workqueue;
 static struct wake_lock mmc_delayed_work_wake_lock;
-atomic_t wakelock_refs = ATOMIC_INIT(0);
 
 /*
  * Enabling software CRCs on the data blocks can be a significant (30%)
@@ -72,15 +71,8 @@ MODULE_PARM_DESC(
 static int mmc_schedule_delayed_work(struct delayed_work *work,
 				     unsigned long delay)
 {
-	int ret;
-
 	wake_lock(&mmc_delayed_work_wake_lock);
-	atomic_inc(&wakelock_refs);
-	ret = queue_delayed_work(workqueue, work, delay);
-	if (!ret && atomic_dec_and_test(&wakelock_refs))	{
-		wake_unlock(&mmc_delayed_work_wake_lock);
-	}
-	return ret;
+	return queue_delayed_work(workqueue, work, delay);
 }
 
 /*
@@ -1113,20 +1105,11 @@ void mmc_rescan(struct work_struct *work)
 
 	if (host->rescan_disable) {
 		spin_unlock_irqrestore(&host->lock, flags);
-		if (atomic_dec_return(&wakelock_refs) > 0) {
-			printk(KERN_DEBUG "Another host want the wakelock : %d\n", atomic_read(&wakelock_refs));
-		}else {
-			printk(KERN_DEBUG "unlock case1 : mmc%d: wake_lock_timeout 0.5 sec %d\n", host->index, atomic_read(&wakelock_refs));
-			wake_lock_timeout(&mmc_delayed_work_wake_lock, msecs_to_jiffies(500));
-		}
 		return;
 	}
 
 	spin_unlock_irqrestore(&host->lock, flags);
 
-//[NAGSM_Android_HDLNC_SDcard_shinjonghyun_20100504 : mutual exclusion when MoviNand and SD cardusing using this funtion
-	mutex_lock(&host->carddetect_lock); 
-//]NAGSM_Android_HDLNC_SDcard_shinjonghyun_20100504 : mutual exclusion when MoviNand and SD cardusing using this funtion	
 
 	mmc_bus_get(host);
 
@@ -1217,27 +1200,13 @@ void mmc_rescan(struct work_struct *work)
 	mmc_power_off(host);
 
 out:
-#if 0
-	//if (extend_wakelock)
-	//	wake_lock_timeout(&mmc_delayed_work_wake_lock, HZ / 2);
-	//else
-	//	wake_unlock(&mmc_delayed_work_wake_lock);
-#else
-	if (atomic_dec_return(&wakelock_refs) > 0) {
-		printk(KERN_DEBUG "Another host want the wakelock : %d\n", atomic_read(&wakelock_refs));
-	}
-	else {
-		printk(KERN_DEBUG "unlock case2 : mmc%d: wake_lock_timeout 0.5 sec %d\n", host->index, atomic_read(&wakelock_refs));
-		wake_lock_timeout(&mmc_delayed_work_wake_lock, msecs_to_jiffies(500));
-	}
-#endif
+	if (extend_wakelock)
+		wake_lock_timeout(&mmc_delayed_work_wake_lock, HZ / 2);
+	else
+		wake_unlock(&mmc_delayed_work_wake_lock);
 
 	if (host->caps & MMC_CAP_NEEDS_POLL)
 		mmc_schedule_delayed_work(&host->detect, HZ);
-//[NAGSM_Android_HDLNC_SDcard_shinjonghyun_20100504 : mutual exclusion when MoviNand and SD cardusing using this funtion
-	mutex_unlock(&host->carddetect_lock); 
-//]NAGSM_Android_HDLNC_SDcard_shinjonghyun_20100504 : mutual exclusion when MoviNand and SD cardusing using this funtion
-
 }
 
 void mmc_start_host(struct mmc_host *host)
@@ -1257,9 +1226,7 @@ void mmc_stop_host(struct mmc_host *host)
 
 	if (host->caps & MMC_CAP_DISABLE)
 		cancel_delayed_work(&host->disable);
-	if (unlikely(cancel_delayed_work(&host->detect)))	{
-		atomic_dec(&wakelock_refs);
-	}
+	cancel_delayed_work_sync(&host->detect);
 	mmc_flush_scheduled_work();
 
 	/* clear pm flags now and let card drivers set them as needed */
@@ -1379,9 +1346,7 @@ int mmc_suspend_host(struct mmc_host *host)
 
 	if (host->caps & MMC_CAP_DISABLE)
 		cancel_delayed_work(&host->disable);
-	if (unlikely(cancel_delayed_work(&host->detect)))	{
-		atomic_dec(&wakelock_refs);
-	}
+	cancel_delayed_work(&host->detect);
 	mmc_flush_scheduled_work();
 
 	mmc_bus_get(host);
@@ -1398,6 +1363,7 @@ int mmc_suspend_host(struct mmc_host *host)
 			mmc_claim_host(host);
 			mmc_detach_bus(host);
 			mmc_release_host(host);
+			host->pm_flags = 0;
 			err = 0;
 		}
 	}
@@ -1486,6 +1452,7 @@ int mmc_pm_notify(struct notifier_block *notify_block,
 
 	case PM_POST_SUSPEND:
 	case PM_POST_HIBERNATION:
+	case PM_POST_RESTORE:
 
 		spin_lock_irqsave(&host->lock, flags);
 		if (mmc_bus_manual_resume(host)) {
@@ -1494,8 +1461,10 @@ int mmc_pm_notify(struct notifier_block *notify_block,
 		}
 		host->rescan_disable = 0;
 		spin_unlock_irqrestore(&host->lock, flags);
+#ifndef CONFIG_SAMSUNG_FASCINATE
 		if (!host->card || host->card->type != MMC_TYPE_SDIO)
-		mmc_detect_change(host, 1);
+#endif
+			mmc_detect_change(host, 0);
 
 	}
 
