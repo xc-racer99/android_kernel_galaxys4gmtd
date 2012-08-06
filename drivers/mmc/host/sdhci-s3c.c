@@ -290,7 +290,7 @@ void sdhci_s3c_force_presence_change(struct platform_device *pdev)
 	struct sdhci_host *host = platform_get_drvdata(pdev);
 
 	printk(KERN_DEBUG "%s : Enter\n",__FUNCTION__);
-	mmc_detect_change(host->mmc, msecs_to_jiffies(200));
+	mmc_detect_change(host->mmc, msecs_to_jiffies(60));
 }
 EXPORT_SYMBOL_GPL(sdhci_s3c_force_presence_change);
 
@@ -423,6 +423,8 @@ static int __devinit sdhci_s3c_probe(struct platform_device *pdev)
 	host->quirks |= SDHCI_QUIRK_NO_ENDATTR_IN_NOPDESC;
 	host->quirks |= SDHCI_QUIRK_BROKEN_CARD_PRESENT_BIT;
 	host->quirks |= SDHCI_QUIRK_BROKEN_TIMEOUT_VAL;
+	if (pdata->must_maintain_clock)
+		host->quirks |= SDHCI_QUIRK_MUST_MAINTAIN_CLOCK;
 
 #ifndef CONFIG_MMC_SDHCI_S3C_DMA
 
@@ -540,19 +542,6 @@ static int __devexit sdhci_s3c_remove(struct platform_device *pdev)
 	return 0;
 }
 
-static int sdhci_s3c_shutdown(struct platform_device *pdev)
-{
-	struct sdhci_host *host =  platform_get_drvdata(pdev);
-	struct sdhci_s3c *sc = sdhci_priv(host);
-
-	if(sc->pdata && sc->pdata->cfg_ext_cd)
-	{
-		free_irq(sc->pdata->ext_cd, sc);
-	}
-
-	return 0;
-}
-
 #ifdef CONFIG_PM
 
 static int sdhci_s3c_suspend(struct platform_device *dev, pm_message_t pm)
@@ -578,8 +567,16 @@ static int sdhci_s3c_resume(struct platform_device *dev)
 	struct sdhci_host *host = platform_get_drvdata(dev);
 	struct s3c_sdhci_platdata *pdata = dev->dev.platform_data;
 	int ret;
+	u32 ier;
 
 	sdhci_resume_host(host);
+
+	if (pdata->enable_intr_on_resume) {
+		ier = sdhci_readl(host, SDHCI_INT_ENABLE);
+		ier |= SDHCI_INT_CARD_INT;
+		sdhci_writel(host, ier, SDHCI_INT_ENABLE);
+		sdhci_writel(host, ier, SDHCI_SIGNAL_ENABLE);
+	}
 
 	if(pdata && pdata->cfg_ext_cd){
 		ret = request_irq(pdata->ext_cd, sdhci_irq_cd, IRQF_SHARED, mmc_hostname(host->mmc), sdhci_priv(host));
@@ -599,8 +596,7 @@ static struct platform_driver sdhci_s3c_driver = {
 	.probe		= sdhci_s3c_probe,
 	.remove		= __devexit_p(sdhci_s3c_remove),
 	.suspend	= sdhci_s3c_suspend,
-	.resume		= sdhci_s3c_resume,
-	.shutdown	= sdhci_s3c_shutdown,
+	.resume	        = sdhci_s3c_resume,
 	.driver		= {
 		.owner	= THIS_MODULE,
 		.name	= "s3c-sdhci",
