@@ -120,7 +120,7 @@ void mmc_request_done(struct mmc_host *host, struct mmc_request *mrq)
 	}
 
 	if (err && cmd->retries) {
-		printk("%s: req failed (CMD%u): %d, retrying...\n",
+		pr_debug("%s: req failed (CMD%u): %d, retrying...\n",
 			mmc_hostname(host), cmd->opcode, err);
 
 		cmd->retries--;
@@ -135,18 +135,9 @@ void mmc_request_done(struct mmc_host *host, struct mmc_request *mrq)
 			cmd->resp[2], cmd->resp[3]);
 
 		if (mrq->data) {
-//[NAGSM_Android_HDLNC_SDcard_shinjonghyun_20100507 : add LOG for MoviNAND debuging	
-		/*
 			pr_debug("%s:     %d bytes transferred: %d\n",
 				mmc_hostname(host),
 				mrq->data->bytes_xfered, mrq->data->error);
-		*/
-			if(mrq->data->error != 0){
-				printk("%s:     %d bytes transferred: %d\n",
-					mmc_hostname(host),
-					mrq->data->bytes_xfered, mrq->data->error);
-			}
-//]NAGSM_Android_HDLNC_SDcard_shinjonghyun_20100507 : add LOG for MoviNAND debuging
 		}
 
 		if (mrq->stop) {
@@ -1164,8 +1155,6 @@ void mmc_rescan(struct work_struct *work)
 
 	mmc_bus_get(host);
 
-	printk(KERN_DEBUG "*** DEBUG : start %s (mmc%d)***\n", __func__, host->index);
-
 	/* if there still is a card present, stop here */
 	if (host->bus_ops != NULL) {
 		mmc_bus_put(host);
@@ -1194,7 +1183,6 @@ void mmc_rescan(struct work_struct *work)
 	/*
 	 * First we search for SDIO...
 	 */
-	printk(KERN_DEBUG "*** DEBUG : First we search for SDIO...(%d)***\n", host->index);
 	err = mmc_send_io_op_cond(host, 0, &ocr);
 	if (!err) {
 		if (mmc_attach_sdio(host, ocr))
@@ -1206,7 +1194,6 @@ void mmc_rescan(struct work_struct *work)
 	/*
 	 * ...then normal SD...
 	 */
-	printk(KERN_DEBUG "*** DEBUG : ...then normal SD...(%d) ***\n", host->index);
 	err = mmc_send_app_op_cond(host, 0, &ocr);
 	if (!err) {
 		if (mmc_attach_sd(host, ocr))
@@ -1218,7 +1205,6 @@ void mmc_rescan(struct work_struct *work)
 	/*
 	 * ...and finally MMC.
 	 */
-	printk(KERN_DEBUG "*** DEBUG : ...and finally MMC. (%d)***\n", host->index);
 	err = mmc_send_op_cond(host, 0, &ocr);
 	if (!err) {
 		if (mmc_attach_mmc(host, ocr))
@@ -1226,8 +1212,6 @@ void mmc_rescan(struct work_struct *work)
 		extend_wakelock = 1;
 		goto out;
 	}
-
-	printk(KERN_DEBUG "*** DEBUG : end %s (mmc%d)***\n", __func__, host->index);
 
 	mmc_release_host(host);
 	mmc_power_off(host);
