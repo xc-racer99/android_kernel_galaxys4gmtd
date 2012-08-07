@@ -33,7 +33,7 @@
 
 extern int OC_LX_OFFSET_LUT[5]; // [antsvx] OC/UV Ln values to match original stock ROM
 
-#ifdef CONFIG_CPUFREQ_OC_UV 
+// #ifdef CONFIG_CPUFREQ_OC_UV 
 
 enum perf_level {
 	L0 = 0,		// 1.4 GHz
@@ -50,18 +50,18 @@ enum perf_level {
 	MAX_PERF_LEVEL = L10
 };
 
-#else
+// #else
 
-enum perf_level {
-	L0 = 0,	// 1GHz
-	L1,	// 800MHz
-	L2,	// 400MHz
-	L3,	// 200MHz
-	L4,	// 100MHz
-	MAX_PERF_LEVEL = L4,
-};
+/* enum perf_level { */
+/* 	L0 = 0,	// 1GHz */
+/* 	L1,	// 800MHz */
+/* 	L2,	// 400MHz */
+/* 	L3,	// 200MHz */
+/* 	L4,	// 100MHz */
+/* 	MAX_PERF_LEVEL = L4, */
+/* }; */
 
-#endif
+// #endif
 
 #define SLEEP_FREQ      (800 * 1000) /* Use 800MHz when entering sleep */
 #define ULP_FREQ	(800 * 1000)
