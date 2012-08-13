@@ -31,7 +31,7 @@
 
 #define dprintk(msg...) cpufreq_debug_printk(CPUFREQ_DEBUG_CORE, \
 						"cpufreq-core", msg)
-
+#define CONFIG_CPUFREQ_OC_UV 
 #ifdef CONFIG_CPUFREQ_OC_UV
 
 #define UV_SIZE 11
