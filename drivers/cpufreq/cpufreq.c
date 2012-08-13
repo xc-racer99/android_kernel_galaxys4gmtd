@@ -42,18 +42,6 @@ int enabled_freqs[UV_SIZE] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 
 #endif
 
-#define CONFIG_CPUFREQ_OC_UV jmk-hack
-
-#ifdef CONFIG_CPUFREQ_OC_UV
-
-#define UV_SIZE 11
-
-int exp_UV_mV[UV_SIZE] = { 0 };
-extern unsigned int freq_uv_table[UV_SIZE][3];
-int enabled_freqs[UV_SIZE] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
-
-#endif
-
 /**
  * The "cpufreq driver" - the arch- or hardware-dependent low
  * level driver of CPUFreq support, and its spinlock. This lock
