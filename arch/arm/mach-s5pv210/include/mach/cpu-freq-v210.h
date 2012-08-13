@@ -33,8 +33,7 @@
 
 extern int OC_LX_OFFSET_LUT[5]; // [antsvx] OC/UV Ln values to match original stock ROM
 
-#define CONFIG_CPUFREQ_OC_UV jmk-hack
-
+#define CONFIG_CPUFREQ_OC_UV 
 #ifdef CONFIG_CPUFREQ_OC_UV 
 
 enum perf_level {
