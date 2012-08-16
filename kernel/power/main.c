@@ -290,10 +290,14 @@ static ssize_t dvfslock_ctrl(const char *buf, size_t count)
 	if (dtime_msec  == 0)
 		return -EINVAL;
 
+        // [antsvx] 
+        // Let this run at standard Samsung (non-OC) frequencies.
+        // The highest freqs L0 and L1 may not be even enabled by the user.
+
 	if (dlevel)
-		dlevel = L1;
+		dlevel = OC_LX_OFFSET_LUT[L1];
 	else
-		dlevel = L0;
+		dlevel = OC_LX_OFFSET_LUT[L0];
 
 	printk(KERN_DEBUG "%s : level=%d, time=%d\n", __func__, dlevel, dtime_msec);
 

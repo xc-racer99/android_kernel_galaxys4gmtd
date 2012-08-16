@@ -657,6 +657,16 @@ static ssize_t show_scaling_setspeed(struct cpufreq_policy *policy, char *buf)
 	return policy->governor->show_setspeed(policy, buf);
 }
 
+	return sprintf(buf, "%d %d %d %d %d %d %d %d %d\n", exp_UV_mV[0], exp_UV_mV[1], exp_UV_mV[2], exp_UV_mV[3], exp_UV_mV[4], exp_UV_mV[5], exp_UV_mV[6], exp_UV_mV[7], exp_UV_mV[8]);
+				exp_UV_mV[0], exp_UV_mV[1], exp_UV_mV[2], exp_UV_mV[3], exp_UV_mV[4], exp_UV_mV[5],
+				exp_UV_mV[6], exp_UV_mV[7], exp_UV_mV[8], exp_UV_mV[9], exp_UV_mV[10]);
+	ret = sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d", 
+	ret = sscanf(buf, "%d %d %d %d %d %d %d %d %d", &exp_UV_mV[0], &exp_UV_mV[1], &exp_UV_mV[2], &exp_UV_mV[3], &exp_UV_mV[4], &exp_UV_mV[5], &exp_UV_mV[6], &exp_UV_mV[7], &exp_UV_mV[8]);
+			&exp_UV_mV[6], &exp_UV_mV[7], &exp_UV_mV[8], &exp_UV_mV[9], &exp_UV_mV[10]);
+	"%d %d %d\n%d %d %d\n%d %d %d\n%d %d %d\n%d %d %d\n%d %d %d\n%d %d %d\n%d %d %d\n%d %d %d\n",
+	freq_uv_table[8][0], freq_uv_table[8][1], freq_uv_table[8][2]);
+	freq_uv_table[9][0], freq_uv_table[9][1], freq_uv_table[9][2],
+	freq_uv_table[10][0], freq_uv_table[10][1], freq_uv_table[10][2]);
 /**
  * show_scaling_driver - show the current cpufreq HW/BIOS limitation
  */
