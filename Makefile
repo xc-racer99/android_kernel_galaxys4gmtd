@@ -356,7 +356,9 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 		   -fno-delete-null-pointer-checks \
 		   -mfpu=neon \
 		   -march=armv5te \
-		   -mtune=cortex-a8
+		   -mtune=cortex-a8 \
+		   -mfpu=vfp3 \
+		   -mfloat-abi=hard
 KBUILD_AFLAGS   := -D__ASSEMBLY__
 
 # Read KERNELRELEASE from include/config/kernel.release (if it exists)
