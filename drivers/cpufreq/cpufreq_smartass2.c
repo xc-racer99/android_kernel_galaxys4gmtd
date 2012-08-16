@@ -43,7 +43,7 @@
  * towards the ideal frequency and slower after it has passed it. Similarly,
  * lowering the frequency towards the ideal frequency is faster than below it.
  */
-#define DEFAULT_AWAKE_IDEAL_FREQ (800*1000)
+#define DEFAULT_AWAKE_IDEAL_FREQ (600*1000)
 static unsigned int awake_ideal_freq;
 
 /*
@@ -68,7 +68,7 @@ static unsigned int ramp_up_step;
  * Zero disables and will calculate ramp down according to load heuristic.
  * When above the ideal freqeuncy we always ramp down to the ideal freq.
  */
-#define DEFAULT_RAMP_DOWN_STEP (300*1000)
+#define DEFAULT_RAMP_DOWN_STEP (400*1000)
 static unsigned int ramp_down_step;
 
 /*
@@ -101,7 +101,7 @@ static unsigned long down_rate_us;
  * The frequency to set when waking up from sleep.
  * When sleep_ideal_freq=0 this will have no effect.
  */
-#define DEFAULT_SLEEP_WAKEUP_FREQ (800*1000)
+#define DEFAULT_SLEEP_WAKEUP_FREQ (1000*1000)
 static unsigned int sleep_wakeup_freq;
 
 /*
