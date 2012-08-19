@@ -346,6 +346,37 @@ static struct s3c_freq clk_info[FREQ_SIZE] = {
 	}
 };
 
+
+/*
+ * update_freq_uv_table() is a "neither here nor there" problem
+ *
+ * The "real" information behind the freq_uv_table is
+ *
+ *    freq_table[index][1]
+ *    dvs_conf[index].arm_volt / 1000
+ *    (dvs_conf[index].arm_volt / 1000) - exp_UV_mV[index]
+ * 
+ * but the sysfs interface for exp_UV_mV and freq_uv_table are in drivers/cpufreq/cpufreq.c
+ * and those arrays are static here. 
+ *
+ * The "right" answer is to safely provide access to freq_table and dvs_conf for sysfs interface
+ * or, better yet, pull all this clocking/voltage control into a unified place
+ *
+ * jmk -- 2012/08/19
+ *
+ */
+
+void update_freq_uv_table(void)
+{
+	int i;
+
+	for (i = 0; i < FREQ_SIZE; i++) {
+		freq_uv_table[i][1] = dvs_conf[i].arm_volt / 1000;
+		freq_uv_table[i][2] = ( dvs_conf[i].arm_volt / 1000 ) - exp_UV_mV[i];
+	}
+}
+EXPORT_SYMBOL(update_freq_uv_table); // used by drivers/cpufreq/cpufreq.c
+
 static int s5pv210_cpufreq_verify_speed(struct cpufreq_policy *policy)
 {
 	if (policy->cpu)
@@ -987,7 +1018,8 @@ static int __init s5pv210_cpufreq_driver_init(struct cpufreq_policy *policy)
 			sizeof(struct s3c_freq));
 	
 	previous_arm_volt = (dvs_conf[level].arm_volt - (exp_UV_mV[level]*1000));
-	freq_uv_table[level][2] = (int) previous_arm_volt / 1000;
+	/* freq_uv_table[level][2] = (int) previous_arm_volt / 1000; */
+	update_freq_uv_table();
 
 #ifdef CONFIG_DVFS_LIMIT
 	for(i = 0; i < DVFS_LOCK_TOKEN_NUM; i++)

@@ -37,7 +37,10 @@
 #define UV_SIZE 11
 
 int exp_UV_mV[UV_SIZE] = { 0 };
+
 extern unsigned int freq_uv_table[UV_SIZE][3];
+extern void update_freq_uv_table(void); // Defined in arch/arm/mach-s5pv210/cpu-freq.c
+
 int enabled_freqs[UV_SIZE] = { 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1 };
 
 #endif
@@ -685,12 +688,17 @@ static ssize_t show_UV_mV_table(struct cpufreq_policy *policy, char *buf) {
 
 static ssize_t store_UV_mV_table(struct cpufreq_policy *policy,
 					const char *buf, size_t count) {
+
+	printk(KERN_DEBUG "store_UV_mV_table received:|%s|", buf);
+
 	unsigned int ret = -EINVAL;
 
 	ret = sscanf(buf, "%d %d %d %d %d %d %d %d %d %d %d", 
 			&exp_UV_mV[0], &exp_UV_mV[1], &exp_UV_mV[2], &exp_UV_mV[3], &exp_UV_mV[4], &exp_UV_mV[5], 
 			&exp_UV_mV[6], &exp_UV_mV[7], &exp_UV_mV[8], &exp_UV_mV[9], &exp_UV_mV[10]);
 
+	update_freq_uv_table();
+	
 	if(ret != 1) {
 		return -EINVAL;
 	}
@@ -714,6 +722,25 @@ static ssize_t show_frequency_voltage_table(struct cpufreq_policy *policy,
 	freq_uv_table[9][0], freq_uv_table[9][1], freq_uv_table[9][2],
 	freq_uv_table[10][0], freq_uv_table[10][1], freq_uv_table[10][2]);
 }
+
+/* AOKP ROM seems to want to write to frequency_voltage_table, not UV_mV_table */
+/* For now, confirm what it is writing to the ROM */
+
+#define AOKP_UV_HACK
+#ifdef AOKP_UV_HACK
+
+static ssize_t store_frequency_voltage_table(struct cpufreq_policy *policy,
+					     const char *buf, size_t count) {
+
+	printk(KERN_DEBUG "store_frequency_voltage_table received:|%s|", buf);
+
+	/* return store_UV_mV_table(policy, buf, count); */
+
+	return count;
+
+}
+
+#endif
 
 static ssize_t show_states_enabled_table(struct cpufreq_policy *policy, char *buf) {
 	return sprintf(buf, "%d %d %d %d %d %d %d %d %d %d %d", 
