@@ -6409,7 +6409,11 @@ static int gp2a_power(bool on)
 
 static int gp2a_light_adc_value(void)
 {
-	return s3c_adc_get_adc_data(9);
+	int ret;
+	ret = 0;
+	ret = s3c_adc_get_adc_data(9);
+	printk(KERN_DEBUG "%s(): %d\n", __func__, ret);
+	return ret;
 }
 
 static struct gp2a_platform_data gp2a_pdata = {
