@@ -18,15 +18,12 @@ load_offset=$boot_offset
 load_len=$boot_len
 
 busybox mount -t yaffs2 /dev/block/mtdblock2 /system
-busybox mount -t yaffs2 /dev/block/mtdblock3 /data
 busybox mount -t yaffs2 /dev/block/mtdblock4 /cache
 
 if busybox test -e /cache/.startrecovery || \
-	busybox test -e /data/.startrecovery || \
 	busybox grep -q bootmode=2 /proc/cmdline ; then
 	# recovery boot
 	busybox rm -fr /cache/.startrecovery
-	busybox rm -fr /data/.startrecovery
 
 	load_offset=$recovery_offset
 	load_len=$recovery_len
@@ -56,7 +53,6 @@ elif ! busybox test -e /system/build.prop ; then
 fi
 
 busybox umount /cache
-busybox umount /data
 busybox umount /system
 busybox umount /sdcard
 busybox rmdir /sdcard
