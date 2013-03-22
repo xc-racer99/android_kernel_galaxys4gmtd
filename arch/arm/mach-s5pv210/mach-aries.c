@@ -20,10 +20,10 @@
 #include <linux/regulator/consumer.h>
 #include <linux/mfd/max8998.h>
 
-#ifdef CONFIG_REGULATOR_MAX8893			
+#ifdef CONFIG_REGULATOR_MAX8893
 #include <linux/mfd/max8893.h>
 #endif
-#ifdef CONFIG_REGULATOR_BH6173			
+#ifdef CONFIG_REGULATOR_BH6173
 #include <linux/mfd/bh6173.h>
 #endif
 
@@ -60,14 +60,14 @@
 #include <mach/gpio-settings-hawk.h>
 #elif  defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD)
 #include <mach/gpio-settings-vibrantplus.h>
-#elif  defined(CONFIG_S5PC110_DEMPSEY_BOARD)				// MR work 
+#elif  defined(CONFIG_S5PC110_DEMPSEY_BOARD)				// MR work
 #include <mach/gpio-settings-dempsey.h>
 #else
 #include <mach/gpio-settings.h>
 #endif
 #include <mach/adc.h>
 #if defined(CONFIG_S5PC110_DEMPSEY_BOARD)
-#if defined (CONFIG_FB_S3C_LDI) 
+#if defined (CONFIG_FB_S3C_LDI)
 #include <linux/lcd.h>
 #endif
 #endif
@@ -209,20 +209,12 @@ static int aries_notifier_call(struct notifier_block *this,
 	int mode = REBOOT_MODE_NONE;
 
 	if ((code == SYS_RESTART) && _cmd) {
-		if (!strcmp((char *)_cmd, "arm11_fota"))
-			mode = REBOOT_MODE_ARM11_FOTA;
-		else if (!strcmp((char *)_cmd, "arm9_fota"))
-			mode = REBOOT_MODE_ARM9_FOTA;
-		else if (!strcmp((char *)_cmd, "recovery"))
-			mode = REBOOT_MODE_RECOVERY;
-		else if (!strcmp((char *)_cmd, "bootloader"))
-			mode = REBOOT_MODE_FAST_BOOT;
-		else if (!strcmp((char *)_cmd, "download"))
-			mode = REBOOT_MODE_DOWNLOAD;
+		if (!strcmp((char *)_cmd, "recovery"))
+			mode = 2; // It's not REBOOT_MODE_RECOVERY, blame Samsung
 		else
 			mode = REBOOT_MODE_NONE;
 	}
-	
+
 	__raw_writel(mode, S5P_INFORM6);
 
 	return NOTIFY_DONE;
@@ -252,7 +244,7 @@ static void gps_gpio_init(void)
 	if (device_create_file(gps_dev, &dev_attr_hwrev) < 0)
 		pr_err("Failed to create device file(%s)!\n",
 		       dev_attr_hwrev.attr.name);
-	
+
 	gpio_request(GPIO_GPS_nRST, "GPS_nRST");	/* XMMC3CLK */
 	s3c_gpio_setpull(GPIO_GPS_nRST, S3C_GPIO_PULL_NONE);
 	s3c_gpio_cfgpin(GPIO_GPS_nRST, S3C_GPIO_OUTPUT);
@@ -324,7 +316,7 @@ static struct s3c2410_uartcfg aries_uartcfgs[] __initdata = {
 #endif
 #else
 		.ufcon		= S5PV210_UFCON_DEFAULT,
-#endif 
+#endif
 	},
 #ifndef CONFIG_FIQ_DEBUGGER
 	{
@@ -355,12 +347,12 @@ static struct s3cfb_lcd s6e63m0 = {
 	.p_height = 86,
 	.bpp = 24,
 	.freq = 60,
-	
+
   .timing = {
-    .h_fp = 82, 
-    .h_bp = 2, 
-    .h_sw = 4,  
-    .v_fp = 5,  
+    .h_fp = 82,
+    .h_bp = 2,
+    .h_sw = 4,
+    .v_fp = 5,
     .v_fpe = 1,
     .v_bp = 1,
     .v_bpe = 1,
@@ -371,7 +363,7 @@ static struct s3cfb_lcd s6e63m0 = {
 		.rise_vclk = 1,
 		.inv_hsync = 1,
 		.inv_vsync = 1,
-		.inv_vden = 0, 
+		.inv_vden = 0,
 	},
 };
 #else
@@ -486,21 +478,21 @@ static struct s5p_media_device aries_media_devs[] = {
 		.bank = 0,
 		.memsize = S5PV210_VIDEO_SAMSUNG_MEMSIZE_PMEM_GPU1,
 		.paddr = 0,
-	},	
+	},
 	[9] = {
 		.id = S5P_MDEV_PMEM_ADSP,
 		.name = "pmem_adsp",
 		.bank = 0,
 		.memsize = S5PV210_VIDEO_SAMSUNG_MEMSIZE_PMEM_ADSP,
 		.paddr = 0,
-	},		
+	},
 	[10] = {
 		.id = S5P_MDEV_TEXSTREAM,
 		.name = "s3c_bc",
 		.bank = 1,
 		.memsize = S5PV210_VIDEO_SAMSUNG_MEMSIZE_TEXTSTREAM,
 		.paddr = 0,
-	},		
+	},
 };
 
 static struct regulator_consumer_supply ldo3_consumer[] = {
@@ -516,7 +508,7 @@ static struct regulator_consumer_supply ldo5_consumer[] = {
 	REGULATOR_SUPPLY("vmmc", NULL),
 };
 
-#if defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD) || defined(CONFIG_S5PC110_HAWK_BOARD) || defined(CONFIG_S5PC110_DEMPSEY_BOARD) || defined (CONFIG_S5PC110_DEMPSEY_BOARD) 
+#if defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD) || defined(CONFIG_S5PC110_HAWK_BOARD) || defined(CONFIG_S5PC110_DEMPSEY_BOARD) || defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 static struct regulator_consumer_supply ldo6_consumer[] = {
 	REGULATOR_SUPPLY("cp_rtc", NULL),
 };
@@ -564,7 +556,7 @@ static struct regulator_consumer_supply ldo12_consumer[] = {
 static struct regulator_consumer_supply ldo13_consumer[] = {
 	REGULATOR_SUPPLY("taos_triton", NULL),
 };
-#elif defined (CONFIG_S5PC110_DEMPSEY_BOARD) 
+#elif defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 
 static struct regulator_consumer_supply ldo13_consumer[] = {
 	REGULATOR_SUPPLY("touch", NULL),
@@ -578,11 +570,11 @@ static struct regulator_consumer_supply ldo13_consumer[] = {
 #endif
 
 
-#if defined (CONFIG_S5PC110_HAWK_BOARD) 
+#if defined (CONFIG_S5PC110_HAWK_BOARD)
 static struct regulator_consumer_supply ldo14_consumer[] = {
 	REGULATOR_SUPPLY("key_led", NULL),
 };
-#elif defined (CONFIG_S5PC110_DEMPSEY_BOARD)	
+#elif defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 static struct regulator_consumer_supply ldo14_consumer[] = {
 	REGULATOR_SUPPLY("tsp_vdd", NULL),
 };
@@ -599,7 +591,7 @@ static struct regulator_consumer_supply ldo14_consumer[] = {
 static struct regulator_consumer_supply ldo15_consumer[] = {
 	REGULATOR_SUPPLY("vga_core", NULL),
 };
-#elif defined (CONFIG_S5PC110_DEMPSEY_BOARD)	
+#elif defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 static struct regulator_consumer_supply ldo15_consumer[] = {
 	REGULATOR_SUPPLY("tsp_avdd", NULL),
 };
@@ -686,7 +678,7 @@ static struct regulator_init_data aries_ldo4_data = {
 		},
 	},
 	.num_consumer_supplies	= ARRAY_SIZE(ldo4_consumer),
-	.consumer_supplies	= ldo4_consumer,	
+	.consumer_supplies	= ldo4_consumer,
 };
 #else
 static struct regulator_init_data aries_ldo4_data = {
@@ -890,7 +882,7 @@ static struct regulator_init_data aries_ldo13_data = {
 	.num_consumer_supplies	= ARRAY_SIZE(ldo13_consumer),
 	.consumer_supplies	= ldo13_consumer,
 };
-#elif defined (CONFIG_S5PC110_DEMPSEY_BOARD) 
+#elif defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 static struct regulator_init_data aries_ldo13_data = {
 	.constraints	= {
 		.name		= "TOUCH_2.8V",
@@ -941,7 +933,7 @@ static struct regulator_init_data aries_ldo14_data = {
 	.num_consumer_supplies	= ARRAY_SIZE(ldo14_consumer),
 	.consumer_supplies	= ldo14_consumer,
 };
-#elif defined (CONFIG_S5PC110_DEMPSEY_BOARD) 			
+#elif defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 static struct regulator_init_data aries_ldo14_data = {
 	.constraints	= {
 		.name		= "TSP_VDD_2.8V",
@@ -991,7 +983,7 @@ static struct regulator_init_data aries_ldo15_data = {
 	.num_consumer_supplies	= ARRAY_SIZE(ldo15_consumer),
 	.consumer_supplies	= ldo15_consumer,
 };
-#elif defined (CONFIG_S5PC110_DEMPSEY_BOARD) 			
+#elif defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 static struct regulator_init_data aries_ldo15_data = {
 	.constraints	= {
 		.name		= "TSP_AVDD_3.3V",
@@ -1039,7 +1031,7 @@ static struct regulator_init_data aries_ldo16_data = {
 	.num_consumer_supplies	= ARRAY_SIZE(ldo16_consumer),
 	.consumer_supplies	= ldo16_consumer,
 };
-#elif defined (CONFIG_S5PC110_KEPLER_BOARD)	|| defined (CONFIG_S5PC110_DEMPSEY_BOARD)	
+#elif defined (CONFIG_S5PC110_KEPLER_BOARD)	|| defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 static struct regulator_init_data aries_ldo16_data = {
 	.constraints	= {
 		.name		= "VGA_AVDD_1.8V",
@@ -1175,7 +1167,7 @@ static struct max8998_regulator_data aries_regulators[] = {
 	{ MAX8998_LDO5,  &aries_ldo5_data },
 #if defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD) || defined(CONFIG_S5PC110_HAWK_BOARD) || defined(CONFIG_S5PC110_DEMPSEY_BOARD)
 	{ MAX8998_LDO6,  &aries_ldo6_data },
-#endif	
+#endif
 	{ MAX8998_LDO7,  &aries_ldo7_data },
 	{ MAX8998_LDO8,  &aries_ldo8_data },
 	{ MAX8998_LDO9,  &aries_ldo9_data },
@@ -1196,15 +1188,15 @@ static struct max8998_regulator_data aries_regulators[] = {
 #if defined (CONFIG_S5PC110_KEPLER_BOARD)
 static struct max8998_adc_table_data temper_table[] =  {
 	/* ADC, Temperature (C) */
-	{ 206,		700	},		
-	{ 220,		690	},	
-	{ 234,		680	},		
-	{ 248,		670	},	
-	{ 262,		660	},	
-	{ 276,		650	},	
-	{ 290,		640	},	
+	{ 206,		700	},
+	{ 220,		690	},
+	{ 234,		680	},
+	{ 248,		670	},
+	{ 262,		660	},
+	{ 276,		650	},
+	{ 290,		640	},
 	{ 304,		630	},
-	{ 314,		620	},	
+	{ 314,		620	},
 	{ 323,		610	},
 	{ 337,		600	},
 	{ 351,		590	},
@@ -1212,7 +1204,7 @@ static struct max8998_adc_table_data temper_table[] =  {
 	{ 379,		570	},
 	{ 395,		560	},
 	{ 408,		550	},
-	{ 423,		540	},	
+	{ 423,		540	},
 	{ 438,		530	},
 	{ 453,		520	},
 	{ 465,		510	},
@@ -1233,7 +1225,7 @@ static struct max8998_adc_table_data temper_table[] =  {
 	{ 752,		360	},
 	{ 775,		350	},
 	{ 798,		340	},
-	{ 821,		330	},	
+	{ 821,		330	},
 	{ 844,		320	},
 	{ 867,		310	},
 	{ 890,		300	},
@@ -1256,32 +1248,32 @@ static struct max8998_adc_table_data temper_table[] =  {
 	{ 1281,		130	},
 	{ 1304,		120	},
 	{ 1327,		110	},
-	{ 1350,		100	},	
+	{ 1350,		100	},
 	{ 1373,		90	},
 	{ 1396,		80	},
 	{ 1419,		70	},
 	{ 1442,		60	},
-	{ 1465,		50	},	
-	{ 1484,		40	}, 
-	{ 1504,		30	}, 
-	{ 1526,		20	}, 
+	{ 1465,		50	},
+	{ 1484,		40	},
+	{ 1504,		30	},
+	{ 1526,		20	},
 	{ 1543,		10	}, // +10
 	{ 1567,		0	}, // 10
-	{ 1569,		-10	}, 
-	{ 1592,		-20	}, 
-	{ 1613,		-30	}, 
-	{ 1633,		-40	}, 
-	{ 1653,		-50	}, 
-	{ 1654,		-60	}, 	
-	{ 1671,		-70	}, 
-	{ 1691,		-80	}, 
-	{ 1711,		-90	}, 
+	{ 1569,		-10	},
+	{ 1592,		-20	},
+	{ 1613,		-30	},
+	{ 1633,		-40	},
+	{ 1653,		-50	},
+	{ 1654,		-60	},
+	{ 1671,		-70	},
+	{ 1691,		-80	},
+	{ 1711,		-90	},
 	{ 1731,		-100}, // 0
 };
 
 #elif defined (CONFIG_S5PC110_HAWK_BOARD)
 static struct max8998_adc_table_data temper_table[] =  {
-	
+
 	/* ADC, Temperature (C) */
 	{ 206,		700	},
 	{ 220,		690	},
@@ -1303,7 +1295,7 @@ static struct max8998_adc_table_data temper_table[] =  {
 	{ 420,		530	},
 	{ 433,		520	},
 	{ 448,		510	},
-	{ 463,		500	},	//20	
+	{ 463,		500	},	//20
 	{ 478,		490	},
 	{ 495,		480	},
 	{ 510,		470	},
@@ -1373,7 +1365,7 @@ static struct max8998_adc_table_data temper_table[] =  {
 	{ 1818,		-170},
 	{ 1832,		-180},
 	{ 1846,		-190},
-	{ 1859,		-200},	//90	
+	{ 1859,		-200},	//90
 };
 
 #elif defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD)
@@ -1381,7 +1373,7 @@ static struct max8998_adc_table_data temper_table[] =  {
 	/* ADC, Temperature (C)  // froyo */
 	{ 206,		700	},
 	{ 220,		690	},
-	{ 240,		680	}, 
+	{ 240,		680	},
 	{ 254,		670	},
 	{ 265,		660	},
 	{ 279,		650	},
@@ -1398,9 +1390,9 @@ static struct max8998_adc_table_data temper_table[] =  {
 	{ 405,		540	},
 	{ 416,		530	},
 	{ 431,		520	},
-	{ 440,		510	}, // [[junghyunseok edit temperature table 20100531	
-	{ 461,		500	},	
-	{ 478,		490	},	
+	{ 440,		510	}, // [[junghyunseok edit temperature table 20100531
+	{ 461,		500	},
+	{ 478,		490	},
 	{ 495,		480	},
 	{ 512,		470	},
 	{ 529,		460	},
@@ -1439,14 +1431,14 @@ static struct max8998_adc_table_data temper_table[] =  {
 	{ 1254,		130	},
 	{ 1278,		120	},
 	{ 1302,		110	},
-	{ 1326,		100	},	
-	{ 1346,		90	},	
-	{ 1366,		80	},	
+	{ 1326,		100	},
+	{ 1346,		90	},
+	{ 1366,		80	},
 	{ 1386,		70	},
 	{ 1406,		60	},
-	{ 1420,		50	}, 
-	{ 1430,		40	}, 
-	{ 1450,		30	}, 
+	{ 1420,		50	},
+	{ 1430,		40	},
+	{ 1450,		30	},
 	{ 1460,		20	},
     { 1470,		10	},
     { 1480,		0	}, // 20
@@ -1457,10 +1449,10 @@ static struct max8998_adc_table_data temper_table[] =  {
 	{ 1635,		-50	},
 	{ 1649,		-60	},
 	{ 1663,		-70	},
-	{ 1677,		-80 }, 	
-	{ 1691,		-90 }, 
+	{ 1677,		-80 },
+	{ 1691,		-90 },
 	{ 1705,		-100}, // 10
-	{ 1722,		-110}, 
+	{ 1722,		-110},
 	{ 1739,		-120},
 	{ 1756,		-130},
 	{ 1773,		-140},
@@ -1492,7 +1484,7 @@ static struct max8998_adc_table_data temper_table[] =  {
 	{ 393, 		550 	},
 	{ 405, 		540 	},
 	{ 419, 		530 	},
-	{ 433, 		520 	},	
+	{ 433, 		520 	},
 	{ 447, 		510 	},
 	{ 461, 		500 	},
 	{ 478, 		490 	},
@@ -1519,14 +1511,14 @@ static struct max8998_adc_table_data temper_table[] =  {
 	{ 928, 		270 	},
 	{ 952, 		260 	},
 	{ 976, 		250 	},
-	{ 1000, 	240 	},	
+	{ 1000, 	240 	},
 	{ 1024, 	230 	},
 	{ 1048, 	220 	},
 	{ 1072, 	210 	},
 	{ 1096, 	200 	},
 	{ 1117, 	190 	},
 	{ 1139, 	180 	},
-	{ 1161, 	170 	},	
+	{ 1161, 	170 	},
 	{ 1183, 	160 	},
 	{ 1205, 	150 	},
 	{ 1227, 	140 	},
@@ -1541,7 +1533,7 @@ static struct max8998_adc_table_data temper_table[] =  {
 	{ 1439, 	50 	},
 	{ 1462, 	40 	},
 	{ 1485, 	30 	},
-	{ 1504, 	20 	},	
+	{ 1504, 	20 	},
 	{ 1525, 	10 	}, // +10
 	{ 1547, 	0 	}, // 10 // 0\A5\EC\A5\EC \A2\AFA\A5\EC\A5\EC
 	{ 1562, 	-10 	},
@@ -1642,7 +1634,7 @@ static struct max8998_adc_table_data temper_table[] =  {
 	{ 1619,  -40 },
 	{ 1632,  -50 },
 	{ 1658,  -60 },
-	{ 1667,  -70 }, 
+	{ 1667,  -70 },
 };
 #endif
 struct max8998_charger_callbacks *charger_callbacks;
@@ -1673,14 +1665,14 @@ static struct max8998_platform_data max8998_pdata = {
 	.buck2_set3		= GPIO_BUCK_2_EN,
 #if defined (CONFIG_S5PC110_VIBRANTPLUS_BOARD)
 	.buck1_voltage_set	= { 1325000, 1250000, 1100000, 1000000 },
-	.buck2_voltage_set	= { 1100000, 1000000 },	
-#elif defined (CONFIG_S5PC110_HAWK_BOARD) || defined(CONFIG_S5PC110_DEMPSEY_BOARD) 
+	.buck2_voltage_set	= { 1100000, 1000000 },
+#elif defined (CONFIG_S5PC110_HAWK_BOARD) || defined(CONFIG_S5PC110_DEMPSEY_BOARD)
 	.buck1_voltage_set	= { 1300000, 1225000, 1075000, 975000 },
 	.buck2_voltage_set	= { 1125000, 1025000 },
 #else
 	.buck1_voltage_set	= { 1275000, 1200000, 1050000, 950000 },
 	.buck2_voltage_set	= { 1100000, 1000000 },
-#endif	
+#endif
 };
 
 struct platform_device sec_device_dpram = {
@@ -1688,7 +1680,7 @@ struct platform_device sec_device_dpram = {
 	.id	= -1,
 };
 
-#if defined(CONFIG_FB_S3C_TL2796) || defined (CONFIG_FB_S3C_uPD161224) 
+#if defined(CONFIG_FB_S3C_TL2796) || defined (CONFIG_FB_S3C_uPD161224)
 static void tl2796_cfg_gpio(struct platform_device *pdev)
 {
 	int i;
@@ -1719,7 +1711,7 @@ static void tl2796_cfg_gpio(struct platform_device *pdev)
 #if defined (CONFIG_S5PC110_HAWK_BOARD)/* nat */
 	/* DISPLAY_SDO*/
 	s3c_gpio_cfgpin(GPIO_DISPLAY_SDO, S3C_GPIO_INPUT);
-	s3c_gpio_setpull(GPIO_DISPLAY_SDO, S3C_GPIO_PULL_UP);	
+	s3c_gpio_setpull(GPIO_DISPLAY_SDO, S3C_GPIO_PULL_UP);
 #endif
 #if defined (CONFIG_S5PC110_HAWK_BOARD)
 	gpio_set_value(GPIO_DISPLAY_CS, 1);
@@ -1965,7 +1957,7 @@ static int lcd_power_on(struct platform_device *pdev)
 			regulator_force_disable(regulator);
 		regulator_put(regulator);
 	}
-	
+
 #endif
 
 	return 1;
@@ -2018,7 +2010,7 @@ static int reset_lcd()
 
 	gpio_set_value(GPIO_MLCD_RST, 1);
 	msleep(20);
-	
+
 	gpio_free(GPIO_MLCD_RST);
 
 	return 1;
@@ -2075,7 +2067,7 @@ static struct s3cfb_lcd ldi_info = {
 	.p_height = 86,
 	.bpp = 24,
 	.freq = 60,
-	
+
 	.timing = {
 		.h_fp = 16,
 		.h_bp = 16,
@@ -2117,7 +2109,7 @@ static struct s3c_platform_fb fb_platform_data __initdata = {
         .swap = FB_SWAP_HWORD | FB_SWAP_WORD,
 
 
-	.lcd = &ldi_info, 
+	.lcd = &ldi_info,
 	.cfg_gpio = lcd_cfg_gpio,
         .backlight_on = lcd_power_on,
         .reset_lcd = reset_lcd,
@@ -2213,7 +2205,7 @@ static struct platform_device s3c_device_i2c7 = {
 	.id			= 7,
 	.dev.platform_data	= &i2c7_platdata,
 };
-#if !(defined (CONFIG_S5PC110_HAWK_BOARD) || defined(CONFIG_S5PC110_KEPLER_BOARD) || defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD)  || defined (CONFIG_S5PC110_DEMPSEY_BOARD)) 
+#if !(defined (CONFIG_S5PC110_HAWK_BOARD) || defined(CONFIG_S5PC110_KEPLER_BOARD) || defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD)  || defined (CONFIG_S5PC110_DEMPSEY_BOARD))
 #if !defined(CONFIG_ARIES_NTT)
 static struct i2c_gpio_platform_data i2c8_platdata = {
 	.sda_pin		= GPIO_FM_SDA_28V,
@@ -2266,7 +2258,7 @@ static struct platform_device s3c_device_i2c10 = {
 static	struct	i2c_gpio_platform_data	i2c11_platdata = {
 	.sda_pin		= GPIO_ALS_SDA_18V,
 	.scl_pin		= GPIO_ALS_SCL_18V,
-	.udelay			= 2,	/* 250KHz */		
+	.udelay			= 2,	/* 250KHz */
 	.sda_is_open_drain	= 0,
 	.scl_is_open_drain	= 0,
 	.scl_is_output_only	= 0,
@@ -2326,14 +2318,14 @@ static struct platform_device s3c_device_i2c12 = {
 
 //[ hdlnc_bp_ytkwon : 20100301
 static	struct	i2c_gpio_platform_data	i2c13_platdata = {
-#if defined(CONFIG_S5PC110_KEPLER_BOARD)|| defined (CONFIG_S5PC110_DEMPSEY_BOARD) 
+#if defined(CONFIG_S5PC110_KEPLER_BOARD)|| defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 	.sda_pin		= GPIO_A1026_SDA,
 	.scl_pin		= GPIO_A1026_SCL,
 #else
 	.sda_pin		= -1,
 	.scl_pin		= -1,
 #endif
-	.udelay			= 1,	/* 250KHz */		
+	.udelay			= 1,	/* 250KHz */
 	.sda_is_open_drain	= 0,
 	.scl_is_open_drain	= 0,
 	.scl_is_output_only	= 0,
@@ -2363,7 +2355,7 @@ static struct platform_device s3c_device_i2c14 = {
 static void touch_keypad_gpio_init(void)
 {
 	int ret = 0;
-#if !defined (CONFIG_S5PC110_DEMPSEY_BOARD) 
+#if !defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 	ret = gpio_request(_3_GPIO_TOUCH_EN, "TOUCH_EN");
 #endif
 	if (ret)
@@ -2372,7 +2364,7 @@ static void touch_keypad_gpio_init(void)
 
 static void touch_keypad_onoff(int onoff)
 {
-#if !defined (CONFIG_S5PC110_DEMPSEY_BOARD) 
+#if !defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 	gpio_direction_output(_3_GPIO_TOUCH_EN, onoff);
 #endif
 	if (onoff == TOUCHKEY_OFF)
@@ -2388,7 +2380,7 @@ static const int touch_keypad_code[] = {
 	KEY_BACK,
 	KEY_SEARCH,
 };
-#elif defined (CONFIG_S5PC110_DEMPSEY_BOARD) 
+#elif defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 static const int touch_keypad_code[] = {
 	KEY_MENU,
 	KEY_HOME,
@@ -2413,15 +2405,15 @@ static const int touch_keypad_code[] = {
 	KEY_UP,
 	KEY_DOWN,
 	KEY_CAMERA,
-	KEY_SEND,	
+	KEY_SEND,
 };
 #endif
 
 #if defined (CONFIG_VIDEO_MHL_V1)
 static	struct	i2c_gpio_platform_data	i2c18_platdata = {
-	.sda_pin		= GPIO_AP_SDA, 
-	.scl_pin		= GPIO_AP_SCL, 
-	.udelay			= 5,	/* 250KHz */		
+	.sda_pin		= GPIO_AP_SDA,
+	.scl_pin		= GPIO_AP_SCL,
+	.udelay			= 5,	/* 250KHz */
 	.sda_is_open_drain	= 0,
 	.scl_is_open_drain	= 0,
 	.scl_is_output_only	= 0,
@@ -2457,7 +2449,7 @@ static struct gpio_event_direct_entry aries_keypad_key_map[] = {
 	.gpio	= S5PV210_GPH3(0),
 	.code	= KEY_HOME,
 }
-#elif defined(CONFIG_S5PC110_KEPLER_BOARD) 
+#elif defined(CONFIG_S5PC110_KEPLER_BOARD)
 	{
 		.gpio	= S5PV210_GPH2(6),
 		.code	= KEY_POWER,
@@ -2582,17 +2574,17 @@ static void set_shared_mic_bias(void)
 		gpio_set_value(GPIO_EARMICBIAS_EN, jack_mic_bias);	// GPJ4(4) : Use earMicbias since hwrev-0.5
 		gpio_set_value(GPIO_EARPATH_SEL, wm8994_mic_bias || jack_mic_bias);
 	}
-#elif defined (CONFIG_S5PC110_DEMPSEY_BOARD) 	
+#elif defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 	gpio_set_value(GPIO_MICBIAS_EN, wm8994_mic_bias);   	// GPJ4(2)
 	gpio_set_value(GPIO_EARMICBIAS_EN, jack_mic_bias);	// GPJ4(4) : Use earMicbias since hwrev-0.5
 	gpio_set_value(GPIO_EARPATH_SEL, wm8994_mic_bias || jack_mic_bias);
-	
+
 #elif defined(CONFIG_S5PC110_HAWK_BOARD)|| defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD)
   	gpio_set_value(GPIO_MICBIAS_EN, wm8994_mic_bias);// GPJ4(2)
 	gpio_set_value(GPIO_MICBIAS_EN2, jack_mic_bias||wm8994_submic_bias); // GPJ2(5)
 	gpio_set_value(GPIO_EARPATH_SEL, wm8994_mic_bias || jack_mic_bias);
 #else
-// ]] HDLNC_BP_pyoungkuenoh_20110223	
+// ]] HDLNC_BP_pyoungkuenoh_20110223
 #if !defined(CONFIG_ARIES_NTT)
 	gpio_set_value(GPIO_MICBIAS_EN, wm8994_mic_bias || jack_mic_bias);
 #else
@@ -2813,7 +2805,7 @@ static int ce147_ldo_en(bool en)
 		goto off;
 	}
 	udelay(50);
-	
+
 	/* Turn CAM_SENSOR_A_2.8V(VDDA) on */
 	gpio_set_value(GPIO_GPB7, 1);
 	mdelay(1);
@@ -2872,7 +2864,7 @@ off:
 }
 
 static int ce147_power_on(void)
-{	
+{
 	int err;
 	bool TRUE = true;
 
@@ -2880,7 +2872,7 @@ static int ce147_power_on(void)
 			pr_err("Failed to initialize camera regulators\n");
 			return -EINVAL;
 	}
-	
+
 	ce147_init();
 
 	/* CAM_VGA_nSTBY - GPB(0)  */
@@ -2900,12 +2892,12 @@ static int ce147_power_on(void)
 
 		return err;
 	}
-	
+
 	ce147_ldo_en(TRUE);
 
 	mdelay(1);
 
-	// CAM_VGA_nSTBY  HIGH		
+	// CAM_VGA_nSTBY  HIGH
 	gpio_direction_output(GPIO_CAM_VGA_nSTBY, 0);
 
 	gpio_set_value(GPIO_CAM_VGA_nSTBY, 1);
@@ -2917,14 +2909,14 @@ static int ce147_power_on(void)
 
 	mdelay(1);
 
-	// CAM_VGA_nRST  HIGH		
+	// CAM_VGA_nRST  HIGH
 	gpio_direction_output(GPIO_CAM_VGA_nRST, 0);
 
-	gpio_set_value(GPIO_CAM_VGA_nRST, 1);	
+	gpio_set_value(GPIO_CAM_VGA_nRST, 1);
 
 	mdelay(1);
 
-	// CAM_VGA_nSTBY  LOW	
+	// CAM_VGA_nSTBY  LOW
 	gpio_direction_output(GPIO_CAM_VGA_nSTBY, 1);
 
 	gpio_set_value(GPIO_CAM_VGA_nSTBY, 0);
@@ -2962,10 +2954,10 @@ static int ce147_power_off(void)
 
 	/* CAM_IO_EN - GPB(7) */
 	err = gpio_request(GPIO_GPB7, "GPB7");
-	
+
 	if(err) {
 		printk(KERN_ERR "failed to request GPB7 for camera control\n");
-	
+
 		return err;
 	}
 
@@ -2974,16 +2966,16 @@ static int ce147_power_off(void)
 
 	if(err) {
 		printk(KERN_ERR "failed to request GPJ0 for camera control\n");
-	
+
 		return err;
 	}
 
 	/* CAM_MEGA_nRST - GPJ1(5) */
 	err = gpio_request(GPIO_CAM_MEGA_nRST, "GPJ1");
-	
+
 	if(err) {
 		printk(KERN_ERR "failed to request GPJ1 for camera control\n");
-	
+
 		return err;
 	}
 
@@ -3004,35 +2996,35 @@ static int ce147_power_off(void)
 		return err;
 	}
 
-	// CAM_VGA_nSTBY  LOW	
+	// CAM_VGA_nSTBY  LOW
 	gpio_direction_output(GPIO_CAM_VGA_nSTBY, 1);
 
 	gpio_set_value(GPIO_CAM_VGA_nSTBY, 0);
 
 	mdelay(1);
 
-	// CAM_VGA_nRST  LOW		
+	// CAM_VGA_nRST  LOW
 	gpio_direction_output(GPIO_CAM_VGA_nRST, 1);
-	
+
 	gpio_set_value(GPIO_CAM_VGA_nRST, 0);
 
 	mdelay(1);
 
 	// CAM_MEGA_nRST - GPJ1(5) LOW
 	gpio_direction_output(GPIO_CAM_MEGA_nRST, 1);
-	
+
 	gpio_set_value(GPIO_CAM_MEGA_nRST, 0);
-	
+
 	mdelay(1);
 
 	// Mclk disable
 	s3c_gpio_cfgpin(GPIO_CAM_MCLK, 0);
-	
+
 	mdelay(1);
 
 	// CAM_MEGA_EN - GPJ0(6) LOW
 	gpio_direction_output(GPIO_CAM_MEGA_EN, 1);
-	
+
 	gpio_set_value(GPIO_CAM_MEGA_EN, 0);
 
 	mdelay(1);
@@ -3040,7 +3032,7 @@ static int ce147_power_off(void)
 	ce147_ldo_en(FALSE);
 
 	mdelay(1);
-	
+
 	gpio_free(GPIO_CAM_MEGA_EN);
 	gpio_free(GPIO_CAM_MEGA_nRST);
 	gpio_free(GPIO_CAM_VGA_nRST);
@@ -3098,7 +3090,7 @@ static int smdkc110_cam1_power(int onoff)
 	}
 
 	gpio_direction_output(S5PV210_GPB(0), 0);
-	
+
 	mdelay(1);
 
 	gpio_direction_output(S5PV210_GPB(0), 1);
@@ -3110,7 +3102,7 @@ static int smdkc110_cam1_power(int onoff)
 	mdelay(1);
 
 	gpio_free(S5PV210_GPB(0));
-	
+
 	mdelay(1);
 
 	/* CAM_VGA_nRST - GPB(2) */
@@ -3179,7 +3171,7 @@ static struct s3c_platform_camera ce147 = {
 		.height	= 480,
 	},
 
-	// Polarity 
+	// Polarity
 	.inv_pclk	= 0,
 	.inv_vsync	= 1,
 	.inv_href	= 0,
@@ -3625,7 +3617,7 @@ static int s5k5ccgx_ldo_en(bool en)
 
 off:
 	result = err;
-	
+
 	/* ldo 16 */
 	/*Turn 3M &VGA CAM_IO_2.8V off*/
 	err = regulator_disable(cam_vga_vddio_regulator);
@@ -3657,7 +3649,7 @@ off:
 		pr_err("Failed to disable vga_core_regulator\n");
 		result = err;
 	}
-	
+
 	/* ldo 12 */
 	/*Turn 3M &VGA CAM_A_2.8V off*/
 	err = regulator_disable(cam_vga_avdd_regulator);
@@ -3670,7 +3662,7 @@ off:
 }
 
 static int s5k5ccgx_power_on(void)
-{	
+{
 	int err;
 	bool TRUE = true;
 	printk("===== s5k5ccgx_power_on\n");
@@ -3681,7 +3673,7 @@ static int s5k5ccgx_power_on(void)
 		pr_err("Failed to initialize camera regulators\n");
 		return -EINVAL;
 	}
-	
+
 	/* CAM_MEGA_EN - GPJ0(6) */
 	err = gpio_request(GPIO_CAM_MEGA_EN, "GPJ0");
 	if(err) {
@@ -3709,12 +3701,12 @@ static int s5k5ccgx_power_on(void)
 		printk(KERN_ERR "failed to request GPJ14 for camera control\n");
 		return err;
 	}
-	
-	//LDO enable	
+
+	//LDO enable
 	s5k5ccgx_ldo_en(TRUE);
-	
+
 	udelay(20); //20us
-	
+
 	// VGA CAM_VGA_EN HIGH
 	gpio_direction_output(S5PV210_GPJ1(2), 0);
 	gpio_set_value(S5PV210_GPJ1(2), 1);
@@ -3723,35 +3715,35 @@ static int s5k5ccgx_power_on(void)
 	s3c_gpio_cfgpin(GPIO_CAM_MCLK, S3C_GPIO_SFN(0x02));
 
 	mdelay(5); // 4ms
-	
+
 	// VGA CAM_VGA_nRST HIGH
 	gpio_direction_output(S5PV210_GPJ1(4), 0);
 	gpio_set_value(S5PV210_GPJ1(4), 1);
-	
+
 	mdelay(7); // 6ms
-	
+
 	// VGA CAM_VGA_EN LOW
 	gpio_direction_output(S5PV210_GPJ1(2), 0);
 	gpio_set_value(S5PV210_GPJ1(2), 0);
-	
+
 	udelay(15); //10us
-	
+
 	// CAM_MEGA_EN HIGH
 	gpio_direction_output(GPIO_CAM_MEGA_EN, 0);
 	gpio_set_value(GPIO_CAM_MEGA_EN, 1);
-	
+
 	udelay(20); //15us
-	
+
 	// CAM_MEGA_nRST HIGH
 	gpio_direction_output(GPIO_CAM_MEGA_nRST, 0);
 	gpio_set_value(GPIO_CAM_MEGA_nRST, 1);
-	
+
 	msleep(50); //50ms
-	
+
 	// VGA CAM_GPIO free
 	gpio_free(S5PV210_GPJ1(2));
 	gpio_free(S5PV210_GPJ1(4));
-	
+
 	//CAM_GPIO free
 	gpio_free(GPIO_CAM_MEGA_EN);
 	gpio_free(GPIO_CAM_MEGA_nRST);
@@ -3764,7 +3756,7 @@ static int s5k5ccgx_power_off(void)
 {
 	int err;
 	bool FALSE = false;
-	
+
 	printk(KERN_DEBUG "s5k5ccgx_power_off\n");
 
 	/* CAM_MEGA_EN - GPJ0(6) */
@@ -3773,56 +3765,56 @@ static int s5k5ccgx_power_off(void)
 		printk(KERN_ERR "failed to request GPJ0 for camera control\n");
 		return err;
 	}
-	
+
 	/* CAM_MEGA_nRST - GPJ1(5) */
 	err = gpio_request(GPIO_CAM_MEGA_nRST, "GPJ1");
 	if(err) {
 		printk(KERN_ERR "failed to request GPJ1 for camera control\n");
 		return err;
 	}
-	
+
 	/* CAM_VGA_EN - GPJ1(2) */
 	err = gpio_request(S5PV210_GPJ1(2), "GPJ12");
 	if(err) {
 		printk(KERN_ERR "failed to request GPJ12 for camera control\n");
 		return err;
 	}
-	
+
 	/* CAM_VGA_nRST - GPJ1(4) */
 	err = gpio_request(S5PV210_GPJ1(4), "GPJ14");
 	if(err) {
 		printk(KERN_ERR "failed to request GPJ14 for camera control\n");
 		return err;
 	}
-		
+
 	// 3M CAM_MEGA_nRST - GPJ1(5) LOW
 	gpio_direction_output(GPIO_CAM_MEGA_nRST, 0);
 	gpio_set_value(GPIO_CAM_MEGA_nRST, 0);
-	
+
 	udelay(50); //50us
-	
+
 	// 3M&VGA Mclk disable
 	s3c_gpio_cfgpin(GPIO_CAM_MCLK, 0);
-	
+
 	// 3M CAM_MEGA_EN - GPJ0(6) LOW
 	gpio_direction_output(GPIO_CAM_MEGA_EN, 0);
 	gpio_set_value(GPIO_CAM_MEGA_EN, 0);
-	
+
 	// VGA CAM_VGA_nRST - GPJ1(4) LOW
 	gpio_direction_output(S5PV210_GPJ1(4), 0);
 	gpio_set_value(S5PV210_GPJ1(4), 0);
-	
+
 	// VGA CAM_VGA_EN - GPJ1(2) LOW
 	gpio_direction_output(S5PV210_GPJ1(2), 0);
 	gpio_set_value(S5PV210_GPJ1(2), 0);
-	
+
 	//LDO disable
 	s5k5ccgx_ldo_en(FALSE);
-	
+
 	// VGA CAM_GPIO free
 	gpio_free(S5PV210_GPJ1(2));
 	gpio_free(S5PV210_GPJ1(4));
-	
+
 	//CAM_GPIO free
 	gpio_free(GPIO_CAM_MEGA_EN);
 	gpio_free(GPIO_CAM_MEGA_nRST);
@@ -3890,7 +3882,7 @@ static struct s3c_platform_camera s5k5ccgx = {
 		.height 	= 480,
 	},
 
-	// Polarity 
+	// Polarity
 	.inv_pclk	= 0,
 	.inv_vsync	= 1,
 	.inv_href	= 0,
@@ -4032,7 +4024,7 @@ static int SR030pc30_ldo_en(bool en)
 
 off:
 	result = err;
-	
+
 	/* ldo 16 */
 	/*Turn 3M &VGA CAM_IO_2.8V off*/
 	err = regulator_disable(cam_vga_vddio_regulator);
@@ -4064,7 +4056,7 @@ off:
 		pr_err("Failed to disable vga_core_regulator\n");
 		result = err;
 	}
-	
+
 	/* ldo 12 */
 	/*Turn 3M &VGA CAM_A_2.8V off*/
 	err = regulator_disable(cam_vga_avdd_regulator);
@@ -4077,7 +4069,7 @@ off:
 }
 
 static int SR030pc30_power_on(void)
-{	
+{
 	int err;
 	bool TRUE = true;
 	printk("===== SR030pc30_power_on\n");
@@ -4088,7 +4080,7 @@ static int SR030pc30_power_on(void)
 		pr_err("Failed to initialize camera regulators\n");
 		return -EINVAL;
 	}
-	
+
 	/* CAM_MEGA_EN - GPJ0(6) */
 	err = gpio_request(GPIO_CAM_MEGA_EN, "GPJ0");
 	if(err) {
@@ -4116,12 +4108,12 @@ static int SR030pc30_power_on(void)
 		printk(KERN_ERR "failed to request GPJ14 for camera control\n");
 		return err;
 	}
-	
-	//LDO enable	
+
+	//LDO enable
 	SR030pc30_ldo_en(TRUE);
-	
+
 	udelay(20); //20us
-	
+
 	// VGA CAM_VGA_EN HIGH
 	gpio_direction_output(S5PV210_GPJ1(2), 0);
 	gpio_set_value(S5PV210_GPJ1(2), 1);
@@ -4130,13 +4122,13 @@ static int SR030pc30_power_on(void)
 	s3c_gpio_cfgpin(GPIO_CAM_MCLK, S3C_GPIO_SFN(0x02));
 
 	udelay(10); //10us
-	
+
 	// 3M CAM_MEGA_EN HIGH
 	gpio_direction_output(GPIO_CAM_MEGA_EN, 0);
 	gpio_set_value(GPIO_CAM_MEGA_EN, 1);
 
 	mdelay(6); //5ms
-	
+
 	// 3M CAM_MEGA_nRST HIGH
 	gpio_direction_output(GPIO_CAM_MEGA_nRST, 0);
 	gpio_set_value(GPIO_CAM_MEGA_nRST, 1);
@@ -4148,17 +4140,17 @@ static int SR030pc30_power_on(void)
 	gpio_set_value(GPIO_CAM_MEGA_EN, 0);
 
 	udelay(10); //10us
-	
+
 	// VGA CAM_VGA_nRST HIGH
 	gpio_direction_output(S5PV210_GPJ1(4), 0);
 	gpio_set_value(S5PV210_GPJ1(4), 1);
-	
+
 	msleep(50); //50ms
-		
+
 	// VGA CAM_GPIO free
 	gpio_free(S5PV210_GPJ1(2));
 	gpio_free(S5PV210_GPJ1(4));
-	
+
 	//CAM_GPIO free
 	gpio_free(GPIO_CAM_MEGA_EN);
 	gpio_free(GPIO_CAM_MEGA_nRST);
@@ -4171,7 +4163,7 @@ static int SR030pc30_power_off(void)
 {
 	int err;
 	bool FALSE = false;
-	
+
 	printk(KERN_DEBUG "SR030pc30_power_off\n");
 
 	/* CAM_MEGA_EN - GPJ0(6) */
@@ -4180,41 +4172,41 @@ static int SR030pc30_power_off(void)
 		printk(KERN_ERR "failed to request GPJ0 for camera control\n");
 		return err;
 	}
-	
+
 	/* CAM_MEGA_nRST - GPJ1(5) */
 	err = gpio_request(GPIO_CAM_MEGA_nRST, "GPJ1");
 	if(err) {
 		printk(KERN_ERR "failed to request GPJ1 for camera control\n");
 		return err;
 	}
-	
+
 	/* CAM_VGA_EN - GPJ1(2) */
 	err = gpio_request(S5PV210_GPJ1(2), "GPJ12");
 	if(err) {
 		printk(KERN_ERR "failed to request GPJ12 for camera control\n");
 		return err;
 	}
-	
+
 	/* CAM_VGA_nRST - GPJ1(4) */
 	err = gpio_request(S5PV210_GPJ1(4), "GPJ14");
 	if(err) {
 		printk(KERN_ERR "failed to request GPJ14 for camera control\n");
 		return err;
 	}
-	
+
 	// VGA CAM_VGA_nRST - GPJ1(4) LOW
 	gpio_direction_output(S5PV210_GPJ1(4), 0);
-	gpio_set_value(S5PV210_GPJ1(4), 0);	
+	gpio_set_value(S5PV210_GPJ1(4), 0);
 
 	// 3M CAM_MEGA_nRST - GPJ1(5) LOW
 	gpio_direction_output(GPIO_CAM_MEGA_nRST, 0);
 	gpio_set_value(GPIO_CAM_MEGA_nRST, 0);
-	
+
 	udelay(50); //50us
-	
+
 	// 3M&VGA Mclk disable
 	s3c_gpio_cfgpin(GPIO_CAM_MCLK, 0);
-	
+
 	// VGA CAM_VGA_EN - GPJ1(2) LOW
 	gpio_direction_output(S5PV210_GPJ1(2), 0);
 	gpio_set_value(S5PV210_GPJ1(2), 0);
@@ -4222,14 +4214,14 @@ static int SR030pc30_power_off(void)
 	// 3M CAM_MEGA_EN - GPJ0(6) LOW
 	gpio_direction_output(GPIO_CAM_MEGA_EN, 0);
 	gpio_set_value(GPIO_CAM_MEGA_EN, 0);
-		
+
 	//LDO disable
 	SR030pc30_ldo_en(FALSE);
-	
+
 	// VGA CAM_GPIO free
 	gpio_free(S5PV210_GPJ1(2));
 	gpio_free(S5PV210_GPJ1(4));
-	
+
 	//CAM_GPIO free
 	gpio_free(GPIO_CAM_MEGA_EN);
 	gpio_free(GPIO_CAM_MEGA_nRST);
@@ -4297,7 +4289,7 @@ static struct s3c_platform_camera sr030pc30 = {
 		.height 	= 480,
 	},
 
-	// Polarity 
+	// Polarity
 	.inv_pclk	= 0,
 	.inv_vsync	= 1,
 	.inv_href	= 0,
@@ -4341,17 +4333,17 @@ static inline int sr130pc10_power_on()
 	if (err) {
 		printk(KERN_ERR "failed to request gpio(GPIO_CAM_CORE_EN)\n");
 		return err;
-	}		
+	}
 
 	/* main CAM_SENSOR_A2.8V */
 	err = gpio_request(GPIO_CAM_IO_EN, "GPB7");
 	if (err) {
 		printk(KERN_ERR "faile to request gpio(GPIO_CAM_IO_EN)\n");
 		return err;
-	}	
+	}
 
 	//NAGSM_Android_HQ_Camera_SungkooLee_20101224 : VT_CORE_EN was added in revision 0.5
-	/* VT_CORE_EN - MP01(0)  */ 
+	/* VT_CORE_EN - MP01(0)  */
 	if(HWREV >= 0x06)
 	{
 		err = gpio_request(S5PV210_MP04(0), "MP04(0)");
@@ -4361,7 +4353,7 @@ static inline int sr130pc10_power_on()
 		}
 	}
 
-	/* CAM_ISP_CORE_1.2V */ 
+	/* CAM_ISP_CORE_1.2V */
 
 	if (IS_ERR_OR_NULL(cam_isp_core_regulator)) {
 		cam_isp_core_regulator = regulator_get(NULL, "cam_isp_core");
@@ -4382,13 +4374,13 @@ static inline int sr130pc10_power_on()
 	gpio_direction_output(GPIO_CAM_CORE_EN, 1);
 	gpio_free(GPIO_CAM_CORE_EN);
 	udelay(1);
-	
+
 	/* main CAM_SENSOR_A2.8V */
 	gpio_direction_output(GPIO_CAM_IO_EN, 1);
 	gpio_free(GPIO_CAM_IO_EN);
 	udelay(1);
 
-	/* CAM_SENSOR_IO_1.8V */	
+	/* CAM_SENSOR_IO_1.8V */
 	if (IS_ERR_OR_NULL(cam_vga_avdd_regulator)) {
 		cam_vga_avdd_regulator = regulator_get(NULL, "vga_avdd");
 		if (IS_ERR_OR_NULL(cam_vga_avdd_regulator)) {
@@ -4403,16 +4395,16 @@ static inline int sr130pc10_power_on()
 		return -EINVAL;
 	}
 	udelay(1);
-	
+
 		/* CAM_ISP_1.8V */
-//	max8998_ldo_enable_direct(MAX8998_LDO14);	
+//	max8998_ldo_enable_direct(MAX8998_LDO14);
 #ifdef CONFIG_S5PC110_DEMPSEY_BOARD
 	REG_power_onoff(1); //on
 #endif
-	udelay(1);	
+	udelay(1);
 
 #if 0
-	/* CAM_AF_2.8V */		
+	/* CAM_AF_2.8V */
 	if (IS_ERR_OR_NULL(cam_af_regulator)) {
 		cam_af_regulator = regulator_get(NULL, "cam_af");
 		if (IS_ERR_OR_NULL(cam_af_regulator)) {
@@ -4426,7 +4418,7 @@ err = regulator_enable(cam_af_regulator);
 		pr_err("Failed to enable regulator cam_af_regulator\n");
 		return -EINVAL;
 	}
-	udelay(1);	
+	udelay(1);
 #endif
 
 	/* Turn CAM_SENSOR_IO_1.6V on */
@@ -4438,7 +4430,7 @@ err = regulator_enable(cam_af_regulator);
 #ifdef CONFIG_REGULATOR_MAX8893
 	bh6173_ldo_enable_direct(1);//LDO 1
 #endif
-	udelay(100);	
+	udelay(100);
 
 	//NAGSM_Android_HQ_Camera_SungkooLee_20101224 : VT_CORE_EN was added in revision 0.5	/* VT_CORE_EN  HIGH */
 	if(HWREV >= 0x06)
@@ -4452,7 +4444,7 @@ err = regulator_enable(cam_af_regulator);
 	/* Turn VT_IO_1.8V on */
 #ifdef CONFIG_REGULATOR_MAX8893
 	bh6173_ldo_enable_direct(2);//LDO 2
-#endif 
+#endif
 	udelay(300);
 
 	/* CAM_VGA_nSTBY  HIGH */
@@ -4466,18 +4458,18 @@ err = regulator_enable(cam_af_regulator);
 
 	/* CAM_VGA_nRST  HIGH */
 	gpio_direction_output(GPIO_CAM_VGA_nRST, 0);
-	gpio_set_value(GPIO_CAM_VGA_nRST, 1);		
+	gpio_set_value(GPIO_CAM_VGA_nRST, 1);
 	mdelay(1);
 
 	gpio_free(GPIO_CAM_VGA_nSTBY);
-	gpio_free(GPIO_CAM_VGA_nRST);	
+	gpio_free(GPIO_CAM_VGA_nRST);
 
 	return 0;
 
 }
 
 static inline int sr130pc10_power_off()
-{	
+{
 
 	int err;
 
@@ -4501,7 +4493,7 @@ static inline int sr130pc10_power_off()
 	if (err) {
 		printk(KERN_ERR "failed to request gpio(GPIO_CAM_CORE_EN)\n");
 		return err;
-	}	
+	}
 
 	/* CAM_SENSOR_A2.8V */
 	err = gpio_request(GPIO_CAM_IO_EN, "GPB7");
@@ -4519,7 +4511,7 @@ static inline int sr130pc10_power_off()
 			printk(KERN_ERR "failed to request GPIO for camera VT_CORE_EN pin\n");
 			return err;
 		}
-	} 
+	}
 
 	/* CAM_VGA_nRST  LOW */
 	gpio_direction_output(GPIO_CAM_VGA_nRST, 1);
@@ -4533,7 +4525,7 @@ static inline int sr130pc10_power_off()
 	/* CAM_VGA_nSTBY  LOW */
 	gpio_direction_output(GPIO_CAM_VGA_nSTBY, 1);
 	gpio_set_value(GPIO_CAM_VGA_nSTBY, 0);
-	udelay(200);	
+	udelay(200);
 
 	/* Turn VT_IO_1.8V off */
 #ifdef CONFIG_REGULATOR_MAX8893
@@ -4541,17 +4533,17 @@ static inline int sr130pc10_power_off()
 #endif
 	udelay(1);
 
-	//NAGSM_Android_HQ_Camera_SungkooLee_20101224 : VT_CORE_EN was added in revision 0.5 
+	//NAGSM_Android_HQ_Camera_SungkooLee_20101224 : VT_CORE_EN was added in revision 0.5
 	/* VT_CORE_EN  LOW */
 	if(HWREV >= 0x06)
 	{
 		gpio_direction_output(S5PV210_MP04(0), 1);
 		gpio_set_value(S5PV210_MP04(0), 0);
 		udelay(10);
-		gpio_free(S5PV210_MP04(0));		
-	} 
+		gpio_free(S5PV210_MP04(0));
+	}
 	udelay(100);
-	
+
 	/* Turn VT_SENSOR_A_2.8V */
 #ifdef CONFIG_REGULATOR_MAX8893
 	bh6173_ldo_disable_direct(1);//LDO 1
@@ -4576,12 +4568,12 @@ static inline int sr130pc10_power_off()
 	}
 	udelay(1);
 #endif
-	
+
 	/* CAM_ISP_1.8V */
 //	max8998_ldo_disable_direct(MAX8998_LDO14);
 #ifdef CONFIG_S5PC110_DEMPSEY_BOARD
 	REG_power_onoff(0); //off
-#endif 
+#endif
 	udelay(1);
 
 	/* CAM_SENSOR_IO_1.8V */
@@ -4599,13 +4591,13 @@ static inline int sr130pc10_power_off()
 		return -EINVAL;
 	}
 	udelay(1);
-	
+
 	/* CAM_SENSOR_A2.8V */
 	gpio_direction_output(GPIO_CAM_IO_EN, 0);
 	gpio_free(GPIO_CAM_IO_EN);
 	udelay(1);
 
-	/* CAM_ISP_CORE_1.2V */ 
+	/* CAM_ISP_CORE_1.2V */
 	if (IS_ERR_OR_NULL(cam_isp_core_regulator)) {
 		cam_isp_core_regulator = regulator_get(NULL, "cam_isp_core");
 		if (IS_ERR_OR_NULL(cam_isp_core_regulator)) {
@@ -4623,10 +4615,10 @@ static inline int sr130pc10_power_off()
 
 	/* CAM_SENSOR_CORE_1.2V */
 	gpio_direction_output(GPIO_CAM_CORE_EN, 0);
-	
-	gpio_free(GPIO_CAM_CORE_EN);	
+
+	gpio_free(GPIO_CAM_CORE_EN);
 	gpio_free(GPIO_CAM_VGA_nSTBY);
-	gpio_free(GPIO_CAM_VGA_nRST);	
+	gpio_free(GPIO_CAM_VGA_nRST);
 
 	return 0;
 
@@ -4635,7 +4627,7 @@ static inline int sr130pc10_power_off()
 static int sr130pc10_power_en(int onoff)
 {
 	int err=0;
-	
+
 	if (onoff != sr130pc10_powered_on) {
 		if (onoff)
 			err = sr130pc10_power_on();
@@ -4711,7 +4703,7 @@ static int m5mo_power_on_sr130()
 {
 
 	int ret;
-	
+
 	ret = gpio_request(GPIO_CAM_CORE_EN, "GPC1(1)");
 	if (ret) {
 		printk(KERN_ERR "failed to request gpio(GPIO_CAM_CORE_EN)\n");
@@ -4732,7 +4724,7 @@ static int m5mo_power_on_sr130()
                 return ret;
         }
 
-	/* VT_CORE_EN - MP01(0)  */ 
+	/* VT_CORE_EN - MP01(0)  */
 	if(HWREV >= 0x06)
 	{
 		ret = gpio_request(S5PV210_MP04(0), "MP04(0)");
@@ -4749,7 +4741,7 @@ static int m5mo_power_on_sr130()
 		return ret;
 	}
 
-	/* CAM_ISP_CORE_1.2V */ 
+	/* CAM_ISP_CORE_1.2V */
 	if (IS_ERR_OR_NULL(cam_isp_core_regulator)) {
 		cam_isp_core_regulator = regulator_get(NULL, "cam_isp_core");
 		if (IS_ERR_OR_NULL(cam_isp_core_regulator)) {
@@ -4759,7 +4751,7 @@ static int m5mo_power_on_sr130()
 	}
 	pr_err("cam_isp_core_regulator = %p\n", cam_isp_core_regulator);
 
-       /* CAM_AF_2.8V */		
+       /* CAM_AF_2.8V */
 	if (IS_ERR_OR_NULL(cam_af_regulator)) {
 		cam_af_regulator = regulator_get(NULL, "cam_af");
 		if (IS_ERR_OR_NULL(cam_af_regulator)) {
@@ -4768,8 +4760,8 @@ static int m5mo_power_on_sr130()
 		}
 	}
 	pr_err("cam_af_regulator = %p\n", cam_af_regulator);
-	
-	/* CAM_SENSOR_IO_1.8V */	
+
+	/* CAM_SENSOR_IO_1.8V */
 	if (IS_ERR_OR_NULL(cam_vga_avdd_regulator)) {
 		cam_vga_avdd_regulator = regulator_get(NULL, "vga_avdd");
 		if (IS_ERR_OR_NULL(cam_vga_avdd_regulator)) {
@@ -4779,21 +4771,21 @@ static int m5mo_power_on_sr130()
 	}
 	pr_err("cam_isp_host_regulator = %p\n", cam_vga_avdd_regulator);
 
-	
-	/* CAM_ISP_CORE_1.2V */ 
+
+	/* CAM_ISP_CORE_1.2V */
 	ret = regulator_enable(cam_isp_core_regulator);
 	if (ret) {
 		pr_err("Failed to enable regulator cam_isp_core\n");
 		return -EINVAL;
 	}
 	udelay(5);
-		
+
 	/* CAM_SENSOR_CORE_1.2V */
 	gpio_direction_output(GPIO_CAM_CORE_EN, 1);
 	gpio_free(GPIO_CAM_CORE_EN);
 	udelay(2);
 
-	/* CAM_AF_2.8V */		
+	/* CAM_AF_2.8V */
 	ret = regulator_enable(cam_af_regulator);
 	if (ret) {
 		pr_err("Failed to enable regulator cam_af_regulator\n");
@@ -4806,20 +4798,20 @@ static int m5mo_power_on_sr130()
 	gpio_free(GPIO_CAM_IO_EN);
 	udelay(1);
 
-	/* CAM_SENSOR_IO_1.8V */	
+	/* CAM_SENSOR_IO_1.8V */
 	ret = regulator_enable(cam_vga_avdd_regulator);
 	if (ret) {
 		pr_err("Failed to enable cam_vga_avdd_regulator\n");
 		return -EINVAL;
 	}
-	udelay(1);	
+	udelay(1);
 
 	/* CAM_ISP_1.8V */
-//	max8998_ldo_enable_direct(MAX8998_LDO14);	
+//	max8998_ldo_enable_direct(MAX8998_LDO14);
 #ifdef CONFIG_S5PC110_DEMPSEY_BOARD
 	REG_power_onoff(1); //on
-#endif 	
-	udelay(1);	
+#endif
+	udelay(1);
 
 	/* Turn VT_CAM_SENSOR_A_2.8V */
 #ifdef CONFIG_REGULATOR_MAX8893
@@ -4840,7 +4832,7 @@ static int m5mo_power_on_sr130()
 	/* Turn VT_IO_1.8V on */
 #ifdef CONFIG_REGULATOR_MAX8893
 	bh6173_ldo_enable_direct(2);//LDO 2
-#endif 
+#endif
 	udelay(300);
 
 	/* CAM_VGA_nSTBY  HIGH */
@@ -4849,12 +4841,12 @@ static int m5mo_power_on_sr130()
 	udelay(10);
 
 	/* MCLK */
-	s3c_gpio_cfgpin(GPIO_CAM_MCLK, S3C_GPIO_SFN(2));	
+	s3c_gpio_cfgpin(GPIO_CAM_MCLK, S3C_GPIO_SFN(2));
 	mdelay(12);
 
 	/* CAM_VGA_nRST  HIGH */
 	gpio_direction_output(GPIO_CAM_VGA_nRST, 0);
-	gpio_set_value(GPIO_CAM_VGA_nRST, 1);	
+	gpio_set_value(GPIO_CAM_VGA_nRST, 1);
 	mdelay(2);
 
 	/* CAM_VGA_nSTBY  LOW */
@@ -4886,7 +4878,7 @@ static int m5mo_power_on_sr130()
 	}
 
 	gpio_free(GPIO_CAM_VGA_nSTBY);
-	gpio_free(GPIO_CAM_VGA_nRST);	
+	gpio_free(GPIO_CAM_VGA_nRST);
 
 	mdelay(5);
 
@@ -4897,7 +4889,7 @@ static int m5mo_power_down_sr130()
 {
 
 	int ret;
-	
+
 	s3c_i2c0_force_stop();
 
 	mdelay(5);
@@ -4924,7 +4916,7 @@ static int m5mo_power_down_sr130()
 			printk(KERN_ERR "failed to request GPIO for camera VT_CORE_EN pin\n");
 			return ret;
 		}
-	} 
+	}
 	/* CAM_SENSOR_A2.8V */
 	ret = gpio_request(GPIO_CAM_IO_EN, "GPB7");
 	if (ret) {
@@ -4938,7 +4930,7 @@ static int m5mo_power_down_sr130()
 		printk(KERN_ERR "faile to request gpio(GPIO_CAM_CORE_EN)\n");
 		return ret;
 	}
-	
+
 
 	//NAGSM_Android_HQ_Camera_SungkooLee_20101224 : GPIO_ISP_RESET was changed to MP04(1) in revision 0.5
 	/*	ISP_RESET */
@@ -4985,15 +4977,15 @@ static int m5mo_power_down_sr130()
 	udelay(1);
 
 
-	// VT_CORE_EN was added in revision 0.5 
+	// VT_CORE_EN was added in revision 0.5
 	/* VT_CORE_EN  LOW */
 	if(HWREV >= 0x06)
 	{
 		gpio_direction_output(S5PV210_MP04(0), 1);
 		gpio_set_value(S5PV210_MP04(0), 0);
 		udelay(10);
-		gpio_free(S5PV210_MP04(0));		
-	} 
+		gpio_free(S5PV210_MP04(0));
+	}
 	udelay(100);
 
 	/* Turn VT_CAM_SENSOR_A_2.8V*/
@@ -5001,8 +4993,8 @@ static int m5mo_power_down_sr130()
 	bh6173_ldo_disable_direct(1);//LDO 1
 #endif
 	udelay(1);
-	
-	/* CAM_AF_2.8V */		
+
+	/* CAM_AF_2.8V */
 		if (IS_ERR_OR_NULL(cam_af_regulator)) {
 		cam_af_regulator = regulator_get(NULL, "cam_af");
 		if (IS_ERR_OR_NULL(cam_af_regulator)) {
@@ -5016,15 +5008,15 @@ static int m5mo_power_down_sr130()
 		pr_err("Failed to disable regulator cam_isp_core\n");
 		return -EINVAL;
 	}
-	udelay(5);	
+	udelay(5);
 
 		/* CAM_ISP_1.8V */
 //	max8998_ldo_disable_direct(MAX8998_LDO14);
 #ifdef CONFIG_S5PC110_DEMPSEY_BOARD
 	REG_power_onoff(0); //off
-#endif 	
+#endif
 	udelay(1);
-	
+
 	/* CAM_SENSOR_IO_1.8V */
 	if (IS_ERR_OR_NULL(cam_vga_avdd_regulator)) {
 		cam_vga_avdd_regulator = regulator_get(NULL, "vga_avdd");
@@ -5039,18 +5031,18 @@ static int m5mo_power_down_sr130()
 		pr_err("Failed to disable cam_vga_vddio_regulator\n");
 		return -EINVAL;
 	}
-	udelay(1);	
+	udelay(1);
 
 	/* CAM_SENSOR_A2.8V */
 	gpio_direction_output(GPIO_CAM_IO_EN, 0);
 	gpio_free(GPIO_CAM_IO_EN);
-	udelay(1);	
+	udelay(1);
 
 	/* CAM_SENSOR_CORE_1.2V */
 	gpio_direction_output(GPIO_CAM_CORE_EN, 0);
 	udelay(5);
 
-	/* CAM_ISP_CORE_1.2V */ 
+	/* CAM_ISP_CORE_1.2V */
 	if (IS_ERR_OR_NULL(cam_isp_core_regulator)) {
 		cam_isp_core_regulator = regulator_get(NULL, "cam_isp_core");
 		if (IS_ERR_OR_NULL(cam_isp_core_regulator)) {
@@ -5068,7 +5060,7 @@ static int m5mo_power_down_sr130()
 	gpio_free(GPIO_CAM_IO_EN);
 	gpio_free(GPIO_CAM_CORE_EN);
 	gpio_free(GPIO_CAM_VGA_nSTBY);
-	gpio_free(GPIO_CAM_VGA_nRST);	
+	gpio_free(GPIO_CAM_VGA_nRST);
 
 	return ret;
 
@@ -5078,7 +5070,7 @@ static int m5mo_power_on()
 {
 
 	int ret;
-	
+
 	ret = gpio_request(GPIO_CAM_CORE_EN, "GPC1(1)");
 	if (ret) {
 		printk(KERN_ERR "faile to request gpio(GPIO_CAM_CORE_EN)\n");
@@ -5088,7 +5080,7 @@ static int m5mo_power_on()
 	gpio_direction_output(GPIO_CAM_CORE_EN, 1);
 	gpio_free(GPIO_CAM_CORE_EN);
 
-	/* CAM_ISP_CORE_1.2V */ 
+	/* CAM_ISP_CORE_1.2V */
 	if (IS_ERR_OR_NULL(cam_isp_core_regulator)) {
 		cam_isp_core_regulator = regulator_get(NULL, "cam_isp_core");
 		if (IS_ERR_OR_NULL(cam_isp_core_regulator)) {
@@ -5114,12 +5106,12 @@ static int m5mo_power_on()
 	mdelay(50);
 
 	/* CAM_ISP_1.8V */
-//	max8998_ldo_enable_direct(MAX8998_LDO14);	
+//	max8998_ldo_enable_direct(MAX8998_LDO14);
 #ifdef CONFIG_S5PC110_DEMPSEY_BOARD
 	REG_power_onoff(1); //on
-#endif 
+#endif
 
-	/* CAM_SENSOR_IO_1.8V */	
+	/* CAM_SENSOR_IO_1.8V */
 	if (IS_ERR_OR_NULL(cam_vga_avdd_regulator)) {
 		cam_vga_avdd_regulator = regulator_get(NULL, "vga_avdd");
 		if (IS_ERR_OR_NULL(cam_vga_avdd_regulator)) {
@@ -5133,7 +5125,7 @@ static int m5mo_power_on()
 		pr_err("Failed to enable cam_vga_avdd_regulator\n");
 		return -EINVAL;
 	}
-	/* CAM_AF_2.8V */		
+	/* CAM_AF_2.8V */
 
 	if (IS_ERR_OR_NULL(cam_af_regulator)) {
 		cam_af_regulator = regulator_get(NULL, "cam_af");
@@ -5150,7 +5142,7 @@ ret = regulator_enable(cam_af_regulator);
 	}
 	mdelay(1);
 	/* MCLK */
-	s3c_gpio_cfgpin(GPIO_CAM_MCLK, S3C_GPIO_SFN(2));	
+	s3c_gpio_cfgpin(GPIO_CAM_MCLK, S3C_GPIO_SFN(2));
 	mdelay(2);
 	/*	ISP_RESET */
 
@@ -5186,7 +5178,7 @@ static int m5mo_power_down()
 {
 
 	int ret;
-	
+
 
 	s3c_i2c0_force_stop();
 	//NAGSM_Android_HQ_Camera_SungkooLee_20101224 : GPIO_ISP_RESET was changed to MP04(1) in revision 0.5
@@ -5215,7 +5207,7 @@ static int m5mo_power_down()
 	/* MCLK */
 	s3c_gpio_cfgpin(GPIO_CAM_MCLK, S3C_GPIO_SFN(0));
 	mdelay(1);
-	/* CAM_AF_2.8V */		
+	/* CAM_AF_2.8V */
 		if (IS_ERR_OR_NULL(cam_af_regulator)) {
 		cam_af_regulator = regulator_get(NULL, "cam_af");
 		if (IS_ERR_OR_NULL(cam_af_regulator)) {
@@ -5228,7 +5220,7 @@ static int m5mo_power_down()
 	if (ret) {
 		pr_err("Failed to disable regulator cam_isp_core\n");
 		return -EINVAL;
-	}	
+	}
 	/* CAM_SENSOR_IO_1.8V */
 	if (IS_ERR_OR_NULL(cam_vga_avdd_regulator)) {
 		cam_vga_avdd_regulator = regulator_get(NULL, "vga_avdd");
@@ -5248,8 +5240,8 @@ static int m5mo_power_down()
 //	max8998_ldo_disable_direct(MAX8998_LDO14);
 #ifdef CONFIG_S5PC110_DEMPSEY_BOARD
 	REG_power_onoff(0); //off
-#endif 
-	mdelay(50);	
+#endif
+	mdelay(50);
 	/* CAM_SENSOR_A2.8V */
 	ret = gpio_request(GPIO_CAM_IO_EN, "GPB7");
 	if (ret) {
@@ -5259,7 +5251,7 @@ static int m5mo_power_down()
 	gpio_direction_output(GPIO_CAM_IO_EN, 0);
 	gpio_free(GPIO_CAM_IO_EN);
 	mdelay(2);
-	/* CAM_ISP_CORE_1.2V */ 
+	/* CAM_ISP_CORE_1.2V */
 	if (IS_ERR_OR_NULL(cam_isp_core_regulator)) {
 		cam_isp_core_regulator = regulator_get(NULL, "cam_isp_core");
 		if (IS_ERR_OR_NULL(cam_isp_core_regulator)) {
@@ -5306,7 +5298,7 @@ void ldo8_control_and_hdmi_phyoff_test()
 }
 
 
-extern int tv_power_status; 
+extern int tv_power_status;
 #ifdef CONFIG_S5PC110_DEMPSEY_BOARD
 extern void __s5p_hdmi_phy_power_offtest();
 #endif
@@ -5330,7 +5322,7 @@ int err;
 		}
 		ldo3_status |= 1 << LDO3_MIPI;
 
-		
+
 	cam_mipi_regulator = regulator_get(NULL, "cam_vmipi");
 			if (IS_ERR_OR_NULL(cam_mipi_regulator)) {
 				pr_err("failed to get cam_mipi_regulator");
@@ -5342,8 +5334,8 @@ int err;
 	/*	if(!tv_power_status)
 		{
 			ldo8_control_and_hdmi_phyoff_test();
-		
-		
+
+
 	}*/
 #ifdef CONFIG_S5PC110_DEMPSEY_BOARD
 		__s5p_hdmi_phy_power_offtest();
@@ -5362,7 +5354,7 @@ int err;
 					return err;
 					}
 		ldo3_status &= ~(1 << LDO3_MIPI);
-		if (ldo3_status == 0)	
+		if (ldo3_status == 0)
 		{
 		        cam_mipi_c_regulator = regulator_get(NULL, "usb_io");
 			if (IS_ERR_OR_NULL(cam_mipi_c_regulator)) {
@@ -5383,7 +5375,7 @@ static int m5mo_power(int enable)
 {
 	int ret;
 
-	printk("%s %s : mach, HWREV 0x%x\n", __func__, enable ? "on" : "down", HWREV);	
+	printk("%s %s : mach, HWREV 0x%x\n", __func__, enable ? "on" : "down", HWREV);
 
 	if (enable != m5mo_powered_on) {
 		if(HWREV >= 0x07)
@@ -5405,13 +5397,13 @@ static int m5mo_power(int enable)
 
 		s3c_csis_power(enable);
 	}
-	
+
 
 	return ret;
 	}
 
 static int m5mo_config_isp_irq()
-{	
+{
 
 	s3c_gpio_cfgpin(GPIO_ISP_INT, S3C_GPIO_SFN(0xF));
 	s3c_gpio_setpull(GPIO_ISP_INT, S3C_GPIO_PULL_NONE);
@@ -5460,7 +5452,7 @@ static struct s3c_platform_camera m5mo = {
 	.mipi_lanes	= 2,
 	.mipi_settle	= 12,
 	.mipi_align	= 32,
-	
+
 	/* Polarity */
 	.inv_pclk	= 0,
 	.inv_vsync 	= 1,
@@ -5471,7 +5463,7 @@ static struct s3c_platform_camera m5mo = {
 	.cam_power	= m5mo_power,
 };
 #endif
-#endif 
+#endif
 /* Interface setting */
 static struct s3c_platform_fimc fimc_plat_lsi = {
 	.srclk_name	= "mout_mpll",
@@ -5531,7 +5523,7 @@ static struct i2c_board_info i2c_devs4[] __initdata = {
 /* I2C1 */
 static struct i2c_board_info i2c_devs1[] __initdata = {
         {
-                I2C_BOARD_INFO("s5p_ddc",(0x74>>1)),    
+                I2C_BOARD_INFO("s5p_ddc",(0x74>>1)),
         },
 };
 
@@ -5638,7 +5630,7 @@ printk("mxt224_power_on\n");
         if (IS_ERR(tspvdd)) {
                 printk(KERN_ERR "%s: cant get TSP_AVDD\n", __func__);
 		return;
-        }	
+        }
 
 	msleep(10);
 	regulator_enable(tspvdd);
@@ -5737,28 +5729,28 @@ static u8 t40_config_e[] = {PROCI_GRIPSUPPRESSION_T40,
 
 static u8 t42_config_e[] = {PROCI_TOUCHSUPPRESSION_T42,
 					0, 0, 0, 0, 0, 0, 0, 0};
-	
+
 	static u8 t46_config_e[] = {SPT_CTECONFIG_T46,
 					0, 3, 24, 35, 0, 0, 1, 0};
-	
+
 	static u8 t47_config_e[] = {PROCI_STYLUS_T47,
 					0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-	
+
 	/*MXT224E_0V5_CONFIG */
 	static u8 t48_config_e[] = {PROCG_NOISESUPPRESSION_T48,
-		3, 132, 64, 0, 0, 0, 0, 0, 10, 15, 
-		0, 0, 0, 6, 6, 0, 0, 64, 4, 64, 
+		3, 132, 64, 0, 0, 0, 0, 0, 10, 15,
+		0, 0, 0, 6, 6, 0, 0, 64, 4, 64,
 					10, 0, 20, 5, 0, 38, 0, 5, 0, 0,
 					0, 0, 0, 0, 32, 50, 2, 3, 1, 46,
-		MXT224_MAX_MT_FINGERS, 10, 40, 10, 10, 10, 10, 143, 40, 143, 
+		MXT224_MAX_MT_FINGERS, 10, 40, 10, 10, 10, 10, 143, 40, 143,
 		80, 18, 15, 0 };
-	
+
 	static u8 t48_config_e_ta[] = {PROCG_NOISESUPPRESSION_T48,
 		3, 132, 82, 0, 0, 0, 0, 0, 10, 15,
-		0, 0, 0, 6, 6, 0, 0, 64, 4, 64, 
+		0, 0, 0, 6, 6, 0, 0, 64, 4, 64,
 				10, 0, 20, 5, 0, 38, 0, 20, 0, 0,
-		0, 0, 0, 0, 0, 40, 2, 5, 2, 47, 
-		MXT224_MAX_MT_FINGERS, 10, 40, 240, 245, 10, 10, 148, 50, 143, 
+		0, 0, 0, 0, 0, 40, 2, 5, 2, 47,
+		MXT224_MAX_MT_FINGERS, 10, 40, 240, 245, 10, 10, 148, 50, 143,
 		80, 18, 10, 0 };
 
 
@@ -5834,7 +5826,7 @@ static struct i2c_board_info i2c_devs5[] __initdata = {
 };
 #elif defined(CONFIG_SENSORS_K3DH) || defined(CONFIG_GYRO_K3G)
 static struct k3dh_platform_data k3dh_data = {
-        .gpio_acc_int = S5PV210_GPH0(1),	
+        .gpio_acc_int = S5PV210_GPH0(1),
 };
 
 
@@ -5852,7 +5844,7 @@ static struct k3g_platform_data k3g_pdata = {
 static struct i2c_board_info i2c_devs5[] __initdata = {
         {
                 I2C_BOARD_INFO("k3g", 0x69),
-                .irq = IRQ_EINT(19),		
+                .irq = IRQ_EINT(19),
                .platform_data = &k3g_pdata,
 
         },
@@ -5870,7 +5862,7 @@ static struct i2c_board_info i2c_devs5[] __initdata = {
 };
 #endif
 
-#if !defined (CONFIG_S5PC110_DEMPSEY_BOARD)	
+#if !defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 static struct i2c_board_info i2c_devs8[] __initdata = {
 	{
 		I2C_BOARD_INFO("Si4709", 0x20 >> 1),
@@ -5898,12 +5890,12 @@ static void fsa9480_usb_cb(bool attached)
        if( max8998_check_vdcin())
 	set_cable_status = attached ? CABLE_TYPE_USB : CABLE_TYPE_NONE;
 	else
-	set_cable_status = CABLE_TYPE_NONE;	
+	set_cable_status = CABLE_TYPE_NONE;
 
 	if (charger_callbacks && charger_callbacks->set_cable)
 		charger_callbacks->set_cable(charger_callbacks, set_cable_status);
 #endif
-	
+
 }
 
 static void fsa9480_charger_cb(bool attached)
@@ -5913,7 +5905,7 @@ static void fsa9480_charger_cb(bool attached)
        if( max8998_check_vdcin())
 	set_cable_status = attached ? CABLE_TYPE_AC : CABLE_TYPE_NONE;
 	else
-	set_cable_status = CABLE_TYPE_NONE;	
+	set_cable_status = CABLE_TYPE_NONE;
 
 	if (charger_callbacks && charger_callbacks->set_cable)
 		charger_callbacks->set_cable(charger_callbacks, set_cable_status);
@@ -5934,9 +5926,9 @@ struct usb_gadget *gadget = platform_get_drvdata(&s3c_device_usbgadget);	//Build
 		switch_set_state(&switch_dock, 1);
 	else
 		switch_set_state(&switch_dock, 0);
-		
+
 #if !defined (CONFIG_S5PC110_HAWK_BOARD) && !defined (CONFIG_S5PC110_KEPLER_BOARD) && !defined (CONFIG_S5PC110_DEMPSEY_BOARD) && !defined (CONFIG_S5PC110_VIBRANTPLUS_BOARD) // mr work
-	if (gadget) 
+	if (gadget)
 	{
 		if (attached)
 			usb_gadget_vbus_connect(gadget);
@@ -5949,28 +5941,28 @@ struct usb_gadget *gadget = platform_get_drvdata(&s3c_device_usbgadget);	//Build
        if( max8998_check_vdcin())
 	set_cable_status = attached ? CABLE_TYPE_USB : CABLE_TYPE_NONE;
 	else
-	set_cable_status = CABLE_TYPE_NONE;	
+	set_cable_status = CABLE_TYPE_NONE;
 
-	   
+
 	if (charger_callbacks && charger_callbacks->set_cable)
 		charger_callbacks->set_cable(charger_callbacks, set_cable_status);
 #endif
-	
+
 }
 
 static void fsa9480_cardock_cb(bool attached)
 {
- 
+
 struct usb_gadget *gadget = platform_get_drvdata(&s3c_device_usbgadget);
 	if (attached)
 		switch_set_state(&switch_dock, 2);
 	else
 		switch_set_state(&switch_dock, 0);
-		
+
 #if !defined (CONFIG_S5PC110_HAWK_BOARD) && !defined (CONFIG_S5PC110_KEPLER_BOARD) && !defined (CONFIG_S5PC110_DEMPSEY_BOARD) && !defined (CONFIG_S5PC110_VIBRANTPLUS_BOARD) // mr work
 //#if 0 /* doodlejump */
-// HDLNC_OPK_20110324 : For USB Charging in Cardock mode		
-	if (gadget) 
+// HDLNC_OPK_20110324 : For USB Charging in Cardock mode
+	if (gadget)
 	{
 		if (attached)
 			usb_gadget_vbus_connect(gadget);
@@ -5983,11 +5975,11 @@ struct usb_gadget *gadget = platform_get_drvdata(&s3c_device_usbgadget);
        if( max8998_check_vdcin())
 	set_cable_status = attached ? CABLE_TYPE_USB : CABLE_TYPE_NONE;
 	else
-	set_cable_status = CABLE_TYPE_NONE;		
+	set_cable_status = CABLE_TYPE_NONE;
 
 	if (charger_callbacks && charger_callbacks->set_cable)
 		charger_callbacks->set_cable(charger_callbacks, set_cable_status);
-#endif	
+#endif
 //#endif
 }
 
@@ -6036,7 +6028,7 @@ static struct i2c_board_info i2c_devs6[] __initdata = {
 #endif
 };
 
-#if !(defined (CONFIG_S5PC110_HAWK_BOARD) || defined (CONFIG_S5PC110_KEPLER_BOARD) || defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD) || defined (CONFIG_S5PC110_DEMPSEY_BOARD))	
+#if !(defined (CONFIG_S5PC110_HAWK_BOARD) || defined (CONFIG_S5PC110_KEPLER_BOARD) || defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD) || defined (CONFIG_S5PC110_DEMPSEY_BOARD))
 static struct pn544_i2c_platform_data pn544_pdata = {
 	.irq_gpio = NFC_IRQ,
 	.ven_gpio = NFC_EN,
@@ -6068,7 +6060,7 @@ static struct platform_device s3c_device_i2c17 = {
 };
 #endif
 
-#if defined (CONFIG_S5PC110_DEMPSEY_BOARD)	
+#if defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 #ifdef CONFIG_REGULATOR_BH6173
 static struct regulator_init_data bh6173_ldo1_data = {
         .constraints    = {
@@ -6176,8 +6168,8 @@ static struct regulator_init_data max8893_ldo1_data = {
 static struct regulator_init_data max8893_ldo2_data = {
         .constraints    = {
                 .name           = "VMEM_VDD_2.8V",
-                .min_uV         = 2800000,   
-                .max_uV         = 2800000,  
+                .min_uV         = 2800000,
+                .max_uV         = 2800000,
 		.always_on	= 1,
                 .apply_uV       = 1,
 		.valid_ops_mask	= REGULATOR_CHANGE_VOLTAGE,
@@ -6189,8 +6181,8 @@ static struct regulator_init_data max8893_ldo2_data = {
 static struct regulator_init_data max8893_ldo3_data = {
         .constraints    = {
                 .name           = "VCC_3.0_MOTOR",
-                .min_uV         = 3000000,   
-                .max_uV         = 3000000,  
+                .min_uV         = 3000000,
+                .max_uV         = 3000000,
 		.always_on	= 0,
                 .apply_uV       = 1,
 		.valid_ops_mask	= REGULATOR_CHANGE_STATUS,
@@ -6204,8 +6196,8 @@ static struct regulator_consumer_supply ldo4_mhl_consumer[] = {
 static struct regulator_init_data max8893_ldo4_data = {
         .constraints    = {
                 .name           = "VCC_1.8V_MHL",
-                .min_uV         = 1800000,   
-                .max_uV         = 1800000,  
+                .min_uV         = 1800000,
+                .max_uV         = 1800000,
 		.always_on	= 0,
                 .apply_uV       = 1,
 		.valid_ops_mask	= REGULATOR_CHANGE_STATUS,
@@ -6220,8 +6212,8 @@ static struct regulator_consumer_supply ldo5_mhl_consumer[] = {
 static struct regulator_init_data max8893_ldo5_data = {
         .constraints    = {
                 .name           = "VCC_3.3V_MHL",
-                .min_uV         = 3300000,   
-                .max_uV         = 3300000,  
+                .min_uV         = 3300000,
+                .max_uV         = 3300000,
 		.always_on	= 0,
                 .apply_uV       = 1,
 		.valid_ops_mask	= REGULATOR_CHANGE_STATUS,
@@ -6236,8 +6228,8 @@ static struct regulator_consumer_supply buck_mhl_consumer[] = {
 static struct regulator_init_data max8893_buck_data = {
         .constraints    = {
                 .name           = "VSIL_1.2A",
-                .min_uV         = 1200000,   
-                .max_uV         = 1200000,  
+                .min_uV         = 1200000,
+                .max_uV         = 1200000,
 		.always_on	= 0,
                 .apply_uV       = 1,
 		.valid_ops_mask	= REGULATOR_CHANGE_STATUS,
@@ -6291,16 +6283,16 @@ static void max17040_power_supply_unregister(struct power_supply *psy)
 static struct max17040_platform_data max17040_pdata = {
 	.power_supply_register = max17040_power_supply_register,
 	.power_supply_unregister = max17040_power_supply_unregister,
-	
+
 #if  defined(CONFIG_S5PC110_KEPLER_BOARD)
 	.rcomp_value = 0xD000,
-#elif defined(CONFIG_S5PC110_HAWK_BOARD)		
+#elif defined(CONFIG_S5PC110_HAWK_BOARD)
 	.rcomp_value = 0xB000,
-#elif defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD)	
+#elif defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD)
 	.rcomp_value = 0xD000,
 #elif defined (CONFIG_S5PC110_DEMPSEY_BOARD)		// mr work
 	.rcomp_value = 0xD000,
-#endif		
+#endif
 
 };
 
@@ -6310,7 +6302,7 @@ static struct i2c_board_info i2c_devs9[] __initdata = {
 		.platform_data = &max17040_pdata,
 #if  defined(CONFIG_S5PC110_KEPLER_BOARD) || defined(CONFIG_S5PC110_HAWK_BOARD) || defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD) || defined (CONFIG_S5PC110_DEMPSEY_BOARD)	// mr work
 		.irq = IRQ_EINT(27),
-#endif		
+#endif
 	},
 };
 
@@ -6326,7 +6318,7 @@ extern int taos_api_get_light_adcvalue(void);
 static void taos_gpio_init(void)
 {
 	printk("taos_gpio_init\n");
-	optical_taos_intialized = 0;	
+	optical_taos_intialized = 0;
 }
 
 static int taos_power(bool on)
@@ -6346,8 +6338,8 @@ static int taos_power(bool on)
 				pr_err("[ERROR] failed to get optical_taos_triton_regulator");
 				return -1;
 			}
-			
-		}		
+
+		}
 		optical_taos_intialized = 1;
 	}
 
@@ -6357,7 +6349,7 @@ static int taos_power(bool on)
 	}
 
 	if ( on ) 	{
-	
+
 		regulator_set_voltage(optical_taos_triton_regulator, optical_taos_triton_LDO_volt, optical_taos_triton_LDO_volt);
 
 		/* Turn LDO13*/
@@ -6368,16 +6360,16 @@ static int taos_power(bool on)
 		}
 
 		taos_api_power_on();
-	} 
+	}
 	else {
-	
+
 		taos_api_power_off();
-		
+
 		err = regulator_disable(optical_taos_triton_regulator);
 		if (err) {
 			pr_err("[ERROR]  Failed to disable optical_taos_triton_regulator \n");
 			return err;
-		}		
+		}
 	}
 
 	return 0;
@@ -6391,8 +6383,8 @@ static int taos_light_adc_value(void)
 	ret = taos_api_get_light_adcvalue();
 
 	printk("(%s) adcvalue = [%d]\n", __func__, ret );
-	
-	return ret; 
+
+	return ret;
 }
 
 static struct taos_platform_data taos_pdata = {
@@ -6403,7 +6395,7 @@ static struct taos_platform_data taos_pdata = {
 
 static struct i2c_board_info i2c_devs11[] __initdata = {
 	{
-		I2C_BOARD_INFO("gp2a", (0x39 )),	
+		I2C_BOARD_INFO("gp2a", (0x39 )),
 		.platform_data = &taos_pdata,
 	},
 };
@@ -6464,7 +6456,7 @@ static struct i2c_board_info i2c_devs11[] __initdata = {
 };
 #endif /* defined (CONFIG_OPTICAL_TAOS_TRITON)	*/
 
-#if defined (CONFIG_SENSORS_AK8975) 
+#if defined (CONFIG_SENSORS_AK8975)
 static struct akm8975_platform_data akm8975_pdata = {
         .gpio_data_ready_int = GPIO_MSENSOR_INT,
 };
@@ -6498,13 +6490,13 @@ static struct i2c_board_info i2c_devs18[] __initdata = {
 	},
 };
 #endif
-//hdlnc_ldj_20100823 
+//hdlnc_ldj_20100823
 static struct i2c_board_info i2c_devs13[] __initdata = {
 	{
 		I2C_BOARD_INFO("A1026_driver", (0x3E)),
 	},
 };
-//hdlnc_ldj_20100823 
+//hdlnc_ldj_20100823
 
 static struct resource ram_console_resource[] = {
 	{
@@ -6657,7 +6649,7 @@ static struct sec_jack_zone sec_jack_zones[] = {
 		/* 0 < adc <= 900, unstable zone, default to 3pole if it stays
 		 * in this range for 800ms (10ms delays, 80 samples)
 		 */
-#if defined(CONFIG_S5PC110_KEPLER_BOARD) || defined (CONFIG_S5PC110_DEMPSEY_BOARD)  
+#if defined(CONFIG_S5PC110_KEPLER_BOARD) || defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 		.adc_high = 600,
 #elif defined(CONFIG_S5PC110_HAWK_BOARD) || defined (CONFIG_S5PC110_VIBRANTPLUS_BOARD)
 		.adc_high = 300,
@@ -6676,8 +6668,8 @@ static struct sec_jack_zone sec_jack_zones[] = {
 		.adc_high = 700,
 #elif defined(CONFIG_S5PC110_HAWK_BOARD)
 		.adc_high = 350,
-#elif defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD)	
-		.adc_high = 300,	
+#elif defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD)
+		.adc_high = 300,
 #else
 		.adc_high = 2000,
 #endif
@@ -6689,7 +6681,7 @@ static struct sec_jack_zone sec_jack_zones[] = {
 		/* 2000 < adc <= 3400, 4 pole zone, default to 4pole if it
 		 * stays in this range for 100ms (10ms delays, 10 samples)
 		 */
-#if defined(CONFIG_S5PC110_KEPLER_BOARD) || defined (CONFIG_S5PC110_DEMPSEY_BOARD)  
+#if defined(CONFIG_S5PC110_KEPLER_BOARD) || defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 		.adc_high = 3000,
 #elif defined(CONFIG_S5PC110_HAWK_BOARD)
 		.adc_high = 3300,
@@ -6758,7 +6750,7 @@ static struct sec_jack_zone sec_jack_zones[] = {
 		.delay_ms = 10,
 		.check_count = 20,
 		.jack_type = SEC_HEADSET_4POLE,
-	},	
+	},
 	{
 		/* adc > 3600, unstable zone, default to 3pole if it stays
 		 * in this range for two seconds (10ms delays, 200 samples)
@@ -6779,11 +6771,11 @@ static struct sec_jack_buttons_zone sec_jack_buttons_zones[] = {
 		/* 0 <= adc <=1000, stable zone */
 		.code		= KEY_MEDIA,
 		.adc_low	= 0,
-#if defined(CONFIG_S5PC110_KEPLER_BOARD)|| defined (CONFIG_S5PC110_DEMPSEY_BOARD)		
+#if defined(CONFIG_S5PC110_KEPLER_BOARD)|| defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 		.adc_high	= 4000,
-#else	
+#else
 		.adc_high	= 1000,
-#endif			
+#endif
 	},
 };
 
@@ -6803,7 +6795,7 @@ struct sec_jack_platform_data sec_jack_pdata = {
 	.send_end_gpio = GPIO_EAR_SEND_END,
 	.send_end_gpio_35 = GPIO_EAR_SEND_END35,
 
-#if defined CONFIG_S5PC110_DEMPSEY_BOARD	
+#if defined CONFIG_S5PC110_DEMPSEY_BOARD
 	.det_active_high = 0,
 #else
 	.det_active_high = 1,
@@ -6829,7 +6821,7 @@ extern void touch_led_on(bool bOn);
 extern int touchkey_ldo_on(bool on);
 #endif
 
-#if defined (CONFIG_S5PC110_KEPLER_BOARD)  || defined (CONFIG_S5PC110_DEMPSEY_BOARD)	
+#if defined (CONFIG_S5PC110_KEPLER_BOARD)  || defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 extern bool charging_mode_get(void);
 #endif
 
@@ -6856,7 +6848,7 @@ static void aries_power_off(void)
 	/* prevent phone reset when AP off */
 	gpio_set_value(GPIO_PHONE_ON, 0);
 
-	#if defined (CONFIG_S5PC110_KEPLER_BOARD) || defined (CONFIG_S5PC110_DEMPSEY_BOARD) 	
+	#if defined (CONFIG_S5PC110_KEPLER_BOARD) || defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 	if(charging_mode_get())
 	{
 		phone_wait_cnt = 11;
@@ -6897,13 +6889,13 @@ static void aries_power_off(void)
 		printk(KERN_EMERG "%s: PHONE OFF Success\n", __func__);
 	}
 	#else
-	while(1) 
+	while(1)
 	{
 		if (gpio_get_value(GPIO_CP_PWR_RST)) // GPIO_CP_PWR_RST is HIGH
 		{
 			printk(KERN_EMERG "%s: Try to Turn Phone Off by CP_PWR_RST\n", __func__);
 
-			if (phone_wait_cnt > 10) 
+			if (phone_wait_cnt > 10)
 			{
 				printk(KERN_EMERG "%s: PHONE OFF Failed\n", __func__);
 
@@ -7056,7 +7048,7 @@ void config_sleep_gpio(void)
 	gpio_get_value(GPIO_CODEC_LDO_EN), gpio_get_value(GPIO_MICBIAS_EN), gpio_get_value(GPIO_SUB_MICBIAS_EN), gpio_get_value(GPIO_EARPATH_SEL));
 #endif
 
-#if defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD) 
+#if defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD)
 	s3c_gpio_setpull(S5PV210_GPH3(5), S3C_GPIO_PULL_DOWN);
 #endif
 
@@ -7128,14 +7120,14 @@ static int wlan_power_en(int onoff)
 
 #if !defined(CONFIG_S5PC110_DEMPSEY_BOARD)
 		if (gpio_get_value(GPIO_BT_nRST) == 0) {
-#endif			
+#endif
 			gpio_set_value(GPIO_WLAN_BT_EN, GPIO_LEVEL_LOW);
 			s3c_gpio_slp_cfgpin(GPIO_WLAN_BT_EN, S3C_GPIO_SLP_OUT0);
 			s3c_gpio_slp_setpull_updown(GPIO_WLAN_BT_EN,
 						S3C_GPIO_PULL_NONE);
-#if !defined(CONFIG_S5PC110_DEMPSEY_BOARD)							
+#if !defined(CONFIG_S5PC110_DEMPSEY_BOARD)
 		}
-#endif	
+#endif
 	}
 	return 0;
 }
@@ -7290,7 +7282,7 @@ static struct platform_device *aries_devices[] __initdata = {
 
 #ifdef	CONFIG_S5P_ADC
 	&s3c_device_adc,
-#endif	
+#endif
 
 	&s5pv210_device_iis0,
 #if !defined(CONFIG_S5PC110_DEMPSEY_BOARD)
@@ -7322,7 +7314,7 @@ static struct platform_device *aries_devices[] __initdata = {
 	&s3c_device_spi_gpio,
 #endif
 
-#if defined (CONFIG_S5PC110_DEMPSEY_BOARD)	
+#if defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 #if defined (CONFIG_FB_S3C_LDI)
 	&ldi_spi_gpio,
 #endif
@@ -7343,20 +7335,20 @@ static struct platform_device *aries_devices[] __initdata = {
 	&s3c_device_i2c5,  /* accel sensor */
 	&s3c_device_i2c6,
 	&s3c_device_i2c7,
-#if !(defined (CONFIG_S5PC110_HAWK_BOARD) || defined (CONFIG_S5PC110_KEPLER_BOARD) || defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD) || defined (CONFIG_S5PC110_DEMPSEY_BOARD))	
+#if !(defined (CONFIG_S5PC110_HAWK_BOARD) || defined (CONFIG_S5PC110_KEPLER_BOARD) || defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD) || defined (CONFIG_S5PC110_DEMPSEY_BOARD))
 	&s3c_device_i2c8,  /* FM radio */
 #else
-//&s3c_device_i2c8, 
-#endif	
+//&s3c_device_i2c8,
+#endif
 	&s3c_device_i2c9,  /* max1704x:fuel_guage */
 	&s3c_device_i2c11, /* optical sensor */
 	&s3c_device_i2c12, /* magnetic sensor */
 	&s3c_device_i2c13,  // hdlnc_bp_ytkwon : 20100301
-#if ! (defined (CONFIG_S5PC110_HAWK_BOARD) || defined (CONFIG_S5PC110_KEPLER_BOARD) || defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD)|| defined (CONFIG_S5PC110_DEMPSEY_BOARD))	
+#if ! (defined (CONFIG_S5PC110_HAWK_BOARD) || defined (CONFIG_S5PC110_KEPLER_BOARD) || defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD)|| defined (CONFIG_S5PC110_DEMPSEY_BOARD))
 	&s3c_device_i2c14, /* nfc sensor */
-#endif	
+#endif
 
-#if defined (CONFIG_S5PC110_DEMPSEY_BOARD)	
+#if defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 #ifdef CONFIG_REGULATOR_MAX8893
 	&s3c_device_i2c15, /*max8893*/
 	&s3c_device_8893consumer,
@@ -7370,7 +7362,7 @@ static struct platform_device *aries_devices[] __initdata = {
 	&s3c_device_i2c17, //NAGSM_Android_HQ_Camera_SoojinKim_20110603
 #endif
 #if defined (CONFIG_VIDEO_MHL_V1)
-	&s3c_device_i2c18,	
+	&s3c_device_i2c18,
 #endif
 #ifdef CONFIG_USB_GADGET
 	&s3c_device_usbgadget,
@@ -7480,13 +7472,13 @@ static void __init aries_fixup(struct machine_desc *desc,
 	mi->bank[1].size = 256 * SZ_1M;
 	mi->bank[1].node = 1;
 
-#if defined (CONFIG_S5PC110_DEMPSEY_BOARD) 
+#if defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 	mi->nr_banks = 2;
 #endif
 
 	mi->bank[2].start = 0x50000000;
 	/* 1M for ram_console buffer */
-#if defined (CONFIG_S5PC110_DEMPSEY_BOARD)		
+#if defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 	mi->bank[2].size = 255 * SZ_1M;
 #else
 	mi->bank[2].size = 127 * SZ_1M;
@@ -7537,7 +7529,7 @@ EXPORT_SYMBOL(hw_version_check);
 
 static void __init fsa9480_gpio_init(void)
 {
-#if !defined (CONFIG_S5PC110_DEMPSEY_BOARD)		
+#if !defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 	s3c_gpio_cfgpin(GPIO_USB_SEL, S3C_GPIO_OUTPUT);
 	s3c_gpio_setpull(GPIO_USB_SEL, S3C_GPIO_PULL_NONE);
 #endif
@@ -7555,7 +7547,7 @@ static void __init fuelgauge_gpio_init(void)
 //	s3c_gpio_setpull(GPIO_KBR3, S3C_GPIO_PULL_NONE);
 
 	 s3c_gpio_cfgpin(GPIO_KBR3, S5PV210_GPH3_3_EXT_INT33_3);
-	 s3c_gpio_setpull(GPIO_KBR3, S3C_GPIO_PULL_NONE);	
+	 s3c_gpio_setpull(GPIO_KBR3, S3C_GPIO_PULL_NONE);
 }
 #endif
 static void __init setup_ram_console_mem(void)
@@ -7583,9 +7575,9 @@ static void __init sound_init(void)
 	reg |= 0x1;
 	__raw_writel(reg, S5P_CLK_OUT);
 
-#if defined(CONFIG_S5PC110_KEPLER_BOARD) || defined (CONFIG_S5PC110_DEMPSEY_BOARD) 	
+#if defined(CONFIG_S5PC110_KEPLER_BOARD) || defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 	gpio_request(GPIO_MICBIAS_EN, "micbias_enable");
-	gpio_request(GPIO_EARMICBIAS_EN, "sub_micbias_enable");	
+	gpio_request(GPIO_EARMICBIAS_EN, "sub_micbias_enable");
 #elif defined(CONFIG_S5PC110_HAWK_BOARD)
   	gpio_request(GPIO_MICBIAS_EN,  "micbias_enable");		 // GPJ4(2)
 	gpio_request(GPIO_MICBIAS_EN2, "sub_micbias_enable"); // GPJ2(5)
@@ -7645,12 +7637,33 @@ static void aries_pm_restart(char mode, const char *cmd)
 	arm_machine_restart(mode, cmd);
 }
 
+// Ugly hack to inject parameters (e.g. device serial, bootmode) into /proc/cmdline
+static void __init aries_inject_cmdline(void) {
+	char *new_command_line;
+	int bootmode = __raw_readl(S5P_INFORM6);
+	int size;
+
+	size = strlen(boot_command_line);
+	new_command_line = kmalloc(size + 40 + 11, GFP_KERNEL);
+	strcpy(new_command_line, saved_command_line);
+	size += sprintf(new_command_line + size, " androidboot.serialno=%08X%08X",
+				system_serial_high, system_serial_low);
+
+	// Only write bootmode when less than 10 to prevent confusion with watchdog
+	// reboot (0xee = 238)
+	if (bootmode < 10) {
+		size += sprintf(new_command_line + size, " bootmode=%d", bootmode);
+	}
+
+	saved_command_line = new_command_line;
+}
+
 static void __init aries_machine_init(void)
 {
 	arm_pm_restart = aries_pm_restart;
-	
+
 	setup_ram_console_mem();
-	s3c_usb_set_serial();
+	aries_inject_cmdline();
 	platform_add_devices(aries_devices, ARRAY_SIZE(aries_devices));
 
 	/* Find out S5PC110 chip version */
@@ -7677,14 +7690,14 @@ static void __init aries_machine_init(void)
 	printk("HWREV is 0x%x\n", HWREV);
 #endif
 #if defined(CONFIG_S5PC110_HAWK_BOARD)
-	HWREV_HAWK = HWREV;	
-	HWREV = 0xa; // The last version of T959 and  : HWREV = 0xa;	
+	HWREV_HAWK = HWREV;
+	HWREV = 0xa; // The last version of T959 and  : HWREV = 0xa;
 	printk("HWREV_HAWK is 0x%x\n", HWREV_HAWK);
 #endif
 
 #if defined (CONFIG_S5PC110_VIBRANTPLUS_BOARD)
 	s3c_gpio_cfgpin(S5PV210_GPH3(5), S3C_GPIO_INPUT);
-	s3c_gpio_setpull( S5PV210_GPH3(5), S3C_GPIO_PULL_NONE); 
+	s3c_gpio_setpull( S5PV210_GPH3(5), S3C_GPIO_PULL_NONE);
 	VPLUSVER = gpio_get_value(S5PV210_GPH3(5));
 	printk("VPLUSVER is 0x%x\n", VPLUSVER);
 #endif
@@ -7697,15 +7710,15 @@ static void __init aries_machine_init(void)
 	android_pmem_set_platdata();
 #endif
 
-	
-#if defined (CONFIG_S5PC110_DEMPSEY_BOARD)	
+
+#if defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 	s3c_gpio_cfgpin(GPIO_MASSMEMORY_EN2, S3C_GPIO_OUTPUT);
 	s3c_gpio_setpull(GPIO_MASSMEMORY_EN2, S3C_GPIO_PULL_NONE);
 	s3c_gpio_cfgpin(GPIO_MASSMEMORY_EN, S3C_GPIO_OUTPUT);
 	s3c_gpio_setpull(GPIO_MASSMEMORY_EN, S3C_GPIO_PULL_NONE);
 	gpio_set_value(GPIO_MASSMEMORY_EN2, GPIO_LEVEL_HIGH);
 	gpio_set_value(GPIO_MASSMEMORY_EN, GPIO_LEVEL_HIGH);
-#endif	
+#endif
 
 
 	/* i2c */
@@ -7734,7 +7747,7 @@ static void __init aries_machine_init(void)
 	i2c_register_board_info(6, i2c_devs6, ARRAY_SIZE(i2c_devs6));
 
 	/* Touch Key */
-#if !defined (CONFIG_S5PC110_DEMPSEY_BOARD)		
+#if !defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 	touch_keypad_gpio_init();
 #endif
 	i2c_register_board_info(10, i2c_devs10, ARRAY_SIZE(i2c_devs10));
@@ -7743,7 +7756,7 @@ static void __init aries_machine_init(void)
 	i2c_register_board_info(7, i2c_devs7, ARRAY_SIZE(i2c_devs7));
 
 	/* FM Radio */
-#if !defined (CONFIG_S5PC110_DEMPSEY_BOARD)		
+#if !defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 	i2c_register_board_info(8, i2c_devs8, ARRAY_SIZE(i2c_devs8));
 #endif
 
@@ -7752,7 +7765,7 @@ static void __init aries_machine_init(void)
 #endif
 	i2c_register_board_info(9, i2c_devs9, ARRAY_SIZE(i2c_devs9));
 	/* optical sensor */
-#if defined (CONFIG_OPTICAL_TAOS_TRITON)	
+#if defined (CONFIG_OPTICAL_TAOS_TRITON)
 	taos_gpio_init();
 #elif defined (CONFIG_OPTICAL_GP2A)
 	gp2a_gpio_init();
@@ -7761,17 +7774,17 @@ static void __init aries_machine_init(void)
 	/* magnetic sensor */
 	i2c_register_board_info(12, i2c_devs12, ARRAY_SIZE(i2c_devs12));
 
-//hdlnc_ldj_20100823 	
+//hdlnc_ldj_20100823
 	i2c_register_board_info(13, i2c_devs13, ARRAY_SIZE(i2c_devs13)); /* audience A1026 */
-//hdlnc_ldj_20100823 	
+//hdlnc_ldj_20100823
 
-#if !(defined (CONFIG_S5PC110_HAWK_BOARD) || defined (CONFIG_S5PC110_KEPLER_BOARD) || defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD) || defined (CONFIG_S5PC110_DEMPSEY_BOARD))	
+#if !(defined (CONFIG_S5PC110_HAWK_BOARD) || defined (CONFIG_S5PC110_KEPLER_BOARD) || defined(CONFIG_S5PC110_VIBRANTPLUS_BOARD) || defined (CONFIG_S5PC110_DEMPSEY_BOARD))
 	/* nfc sensor */
 	i2c_register_board_info(14, i2c_devs14, ARRAY_SIZE(i2c_devs14));
 #endif
 
 
-#if defined (CONFIG_S5PC110_DEMPSEY_BOARD)	
+#if defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 #ifdef CONFIG_REGULATOR_MAX8893
 	i2c_register_board_info(15, i2c_devs15, ARRAY_SIZE(i2c_devs15));
 #endif
@@ -7780,16 +7793,16 @@ static void __init aries_machine_init(void)
 #endif
 #endif
 #if defined (CONFIG_VIDEO_MHL_V1)
-	i2c_register_board_info(18, i2c_devs18, ARRAY_SIZE(i2c_devs18)); 
+	i2c_register_board_info(18, i2c_devs18, ARRAY_SIZE(i2c_devs18));
 #endif
 
 
-#if defined (CONFIG_FB_S3C_TL2796)|| defined (CONFIG_FB_S3C_uPD161224) 
+#if defined (CONFIG_FB_S3C_TL2796)|| defined (CONFIG_FB_S3C_uPD161224)
 	spi_register_board_info(spi_board_info, ARRAY_SIZE(spi_board_info));
 	s3cfb_set_platdata(&tl2796_data);
 #endif
 
-#if defined (CONFIG_S5PC110_DEMPSEY_BOARD)	
+#if defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 #if defined (CONFIG_FB_S3C_LDI)
 	ldi_fb_init();
 #endif
@@ -7842,7 +7855,7 @@ static void __init aries_machine_init(void)
 	register_reboot_notifier(&aries_reboot_notifier);
 
 	aries_switch_init();
-	
+
 #if ! defined (CONFIG_GPS_CHIPSET_STE_CG2900)
 #if !defined(CONFIG_ARIES_NTT)
 	gps_gpio_init();
@@ -7855,11 +7868,11 @@ static void __init aries_machine_init(void)
 
 #ifdef CONFIG_S5PC110_DEMPSEY_BOARD
 	s3c_gpio_cfgpin( GPIO_VT_CAM_SCL_18V, 1 );
-	s3c_gpio_setpull( GPIO_VT_CAM_SCL_18V, S3C_GPIO_PULL_UP); 
+	s3c_gpio_setpull( GPIO_VT_CAM_SCL_18V, S3C_GPIO_PULL_UP);
 	s3c_gpio_cfgpin( GPIO_VT_CAM_SDA_18V, 1 );
-	s3c_gpio_setpull(GPIO_VT_CAM_SDA_18V, S3C_GPIO_PULL_UP); 	
+	s3c_gpio_setpull(GPIO_VT_CAM_SDA_18V, S3C_GPIO_PULL_UP);
 #endif
-#if !defined (CONFIG_S5PC110_DEMPSEY_BOARD)	
+#if !defined (CONFIG_S5PC110_DEMPSEY_BOARD)
 	if (gpio_is_valid(GPIO_MSENSE_nRST)) {
 		if (gpio_request(GPIO_MSENSE_nRST, "GPB"))
 			printk(KERN_ERR "Failed to request GPIO_MSENSE_nRST!\n");
@@ -7900,10 +7913,10 @@ void otg_phy_init(void)
 	/* set DC level as 6 (6%) */
 /*	writel((readl(S3C_USBOTG_PHYTUNE) & ~(0xf)) | (0x1<<2) | (0x1<<1),
 			S3C_USBOTG_PHYTUNE);         eye-diagram tuning      */
-	
+
 	writel((readl(S3C_USBOTG_PHYTUNE) & ~(0xf)) | (0xf),
 			S3C_USBOTG_PHYTUNE);
-	
+
 }
 EXPORT_SYMBOL(otg_phy_init);
 
@@ -8056,7 +8069,7 @@ void cg29xx_uart_enable(void)
 {
 	printk("cg29xx_uart_enable");
 	s3c_setup_uart_cfg_gpio(1);
-}		
+}
 EXPORT_SYMBOL(cg29xx_uart_enable);
 void cg29xx_rts_gpio_control(int flag)
 {
@@ -8076,8 +8089,8 @@ void cg29xx_rts_gpio_control(int flag)
 		s3c_gpio_setpull(GPIO_GPS_RTS, S3C_GPIO_PULL_UP);
 		gpio_set_value(GPIO_GPS_RTS, 1);
 //		s3c_gpio_setpin(GPIO_GPS_RTS, 1); Kernel Panic
-	}		
-		
+	}
+
 }
 EXPORT_SYMBOL(cg29xx_rts_gpio_control);
 int cg29xx_cts_gpio_level(void)

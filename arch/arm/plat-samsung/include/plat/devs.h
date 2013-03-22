@@ -144,9 +144,6 @@ extern struct platform_device s3c_device_usb_mass_storage;
 #  define USBSTATUS_DM				0x20
 #  define USBSTATUS_ACM				0x40
 #  define USBSTATUS_SAMSUNG_KIES_REAL		0x80
-
-/* soonyong.cho : This is for setting unique serial number */
-void __init s3c_usb_set_serial(void);
 #endif /* CONFIG_USB_ANDROID_SAMSUNG_COMPOSITE */
 
 extern struct platform_device s3c_device_rndis;
