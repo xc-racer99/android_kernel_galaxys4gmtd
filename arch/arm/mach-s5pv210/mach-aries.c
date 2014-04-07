@@ -305,6 +305,7 @@ static struct s3c2410_uartcfg aries_uartcfgs[] __initdata = {
                 .ufcon		 = S3C2410_UFCON_FIFOMODE | S5PV210_UFCON_TXTRIG64 | S5PV210_UFCON_RXTRIG8, // -> RX trigger leve : 8byte.
 #else
 		.ufcon		 = S3C2410_UFCON_FIFOMODE | S5PV210_UFCON_TXTRIG64 | S5PV210_UFCON_RXTRIG1, // -> RX trigger leve : 8byte.
+#endif
 #else
 		.ufcon		= S5PV210_UFCON_DEFAULT,
 #endif 
