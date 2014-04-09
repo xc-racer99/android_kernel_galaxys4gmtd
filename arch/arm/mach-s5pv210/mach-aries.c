@@ -7854,11 +7854,13 @@ static void __init aries_machine_init(void)
 	register_reboot_notifier(&aries_reboot_notifier);
 
 	aries_switch_init();
+
 #if ! defined (CONFIG_GPS_CHIPSET_STE_CG2900)
 #if !defined(CONFIG_ARIES_NTT)
 	gps_gpio_init();
 #endif
 #endif
+
 	aries_init_wifi_mem();
 
 	onenand_init();
