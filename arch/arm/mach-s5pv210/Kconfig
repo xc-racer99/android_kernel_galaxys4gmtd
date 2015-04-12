@@ -192,6 +192,12 @@ config GPS_CHIPSET_STE_GNS7560
         help
          add  GPS config
 
+config GPS_CHIPSET_STE_CG2900
+        bool "add GPS GNS2900"
+        default n
+        help
+         add  GPS config
+
 config ARIES_EUR
 	bool "select S1 Europe"
 	depends on MACH_ARIES
