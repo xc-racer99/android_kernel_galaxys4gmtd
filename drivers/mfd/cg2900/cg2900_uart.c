@@ -104,8 +104,8 @@
 //#define HIGH_BAUD_RATE     115200
 
 /* HCI TTY line discipline value */
-#ifndef N_HCI
-#define N_HCI			15
+#ifndef N_BT_HCI
+#define N_BT_HCI	22			
 #endif
 
 /* IOCTLs for UART */
@@ -1403,7 +1403,7 @@ check_h4_header:
 }
 
 /**
- * uart_tty_open() - Called when UART line discipline changed to N_HCI.
+ * uart_tty_open() - Called when UART line discipline changed to N_BT_HCI.
  * @tty:	Pointer to associated TTY instance data.
  *
  * Returns:
@@ -1597,7 +1597,7 @@ static unsigned int uart_tty_poll(struct tty_struct *tty, struct file *filp,
 /* The uart_ldisc structure is used when registering to the UART framework. */
 static struct tty_ldisc_ops uart_ldisc = {
 	.magic        = TTY_LDISC_MAGIC,
-	.name         = "n_hci",
+	.name         = "n_bt_hci",
 	.open         = uart_tty_open,
 	.close        = uart_tty_close,
 	.read         = uart_tty_read,
@@ -1663,7 +1663,7 @@ int uart_init(void)
 #endif /* BAUD_RATE_FIX */
 
 	/* Register the tty discipline. We will see what will be used. */
-	err = tty_register_ldisc(N_HCI, &uart_ldisc);
+	err = tty_register_ldisc(N_BT_HCI, &uart_ldisc);
 	if (err) {
 		CG2900_ERR("HCI line discipline registration failed. (0x%X)",
 			   err);
@@ -1696,7 +1696,7 @@ void uart_exit(void)
 	CG2900_INFO("uart_exit");
 
 	/* Release tty registration of line discipline */
-	err = tty_unregister_ldisc(N_HCI);
+	err = tty_unregister_ldisc(N_BT_HCI);
 	if (err)
 		CG2900_ERR("Can't unregister HCI line discipline (%d)", err);
 
