@@ -25,6 +25,7 @@
 #ifdef CONFIG_GPS_CHIPSET_STE_CG2900
 #ifndef N_BT_HCI
 #define N_BT_HCI	22
+#endif
 #else
 #ifndef N_HCI
 #define N_HCI	15
